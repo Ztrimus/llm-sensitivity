@@ -1582,6 +1582,21 @@ files = [
 diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
+name = "pyphen"
+version = "0.14.0"
+description = "Pure Python module to hyphenate text"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pyphen-0.14.0-py3-none-any.whl", hash = "sha256:414c9355958ca3c6a3ff233f65678c245b8ecb56418fb291e2b93499d61cd510"},
+    {file = "pyphen-0.14.0.tar.gz", hash = "sha256:596c8b3be1c1a70411ba5f6517d9ccfe3083c758ae2b94a45f2707346d8e66fa"},
+]
+
+[package.extras]
+doc = ["sphinx", "sphinx_rtd_theme"]
+test = ["flake8", "isort", "pytest"]
+
+[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -2084,6 +2099,20 @@ pure-eval = "*"
 tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
+name = "textstat"
+version = "0.7.3"
+description = "Calculate statistical features from text"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "textstat-0.7.3-py3-none-any.whl", hash = "sha256:cbd9d641aa5abff0852638f0489913f31ea52fe597ccbaa337b4fc2a44efd15e"},
+    {file = "textstat-0.7.3.tar.gz", hash = "sha256:60b63cf8949f45bbb3b4205e4411bbc1cd66df4c08aef12545811c7e6e24f011"},
+]
+
+[package.dependencies]
+pyphen = "*"
+
+[[package]]
 name = "thinc"
 version = "8.2.3"
 description = "A refreshing functional take on deep learning, compatible with your favorite libraries"
@@ -2419,4 +2448,4 @@ pillow = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "add35f02d6daff27b102589c6ba7f9d615d496b8a5078ba520c139f16d3d737a"
+content-hash = "72ceccdca358e9b668256624338e57742eb3e8cb7cc167503ad651215fa3ccc4"

@@ -1,2 +1,3 @@
 .env
 .DS_Store
+data/GitHubTypo/github-typo-corpus.v1.0.0.jsonl
