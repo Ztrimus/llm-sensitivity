@@ -28,3 +28,7 @@
    - Navigate to either `/home/<username>/` (ideal for script files) or `/scratch/<username>/` (best for large files, models, or datasets).
 8. **Start Working**  
    - You're now connected and can start using the remote environment!
+
+# SOL Resources
+- SOL Computer UI: https://ood05.sol.rc.asu.edu/pun/sys/dashboard/
+- VSCode setup for SOL: https://asurc.atlassian.net/wiki/spaces/RC/pages/1907818602/VSCode
