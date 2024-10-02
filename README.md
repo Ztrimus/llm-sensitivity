@@ -10,5 +10,9 @@ LLM Sensitivity
 ```sh
 module load mamba/latest
 source activate llm-safety
+```
 
+- Create [`credentials.py`](src/config/credentials.py) at src/config location with your personal credentials.
+```python
+ASURITE_ID = "YOUR_ASURITE_ID"
 ```
