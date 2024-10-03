@@ -4,7 +4,7 @@
 #SBATCH -p general
 #SBATCH -q grp_corman
 #SBATCH -t 12:30:00
-#SBATCH -G a100:2
+#SBATCH -G a100:1
 #SBATCH --mem=80G
 #SBATCH -o slurm.%j.out
 #SBATCH -e slurm.%j.err
