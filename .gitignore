@@ -4,3 +4,5 @@ data/GitHubTypo/github-typo-corpus.v1.0.0.jsonl
 __pycache__/
 *.py[cod]
 src/config/credentials.py
+*.err
+*.out
