@@ -3,11 +3,11 @@
 #SBATCH -N 1
 #SBATCH -p general
 #SBATCH -q public
-#SBATCH -t 4:00:00
-#SBATCH -G a100:1
+#SBATCH -t 00:10:00
+#SBATCH --gres=gpu:a100:1
 #SBATCH --mem=80G
-#SBATCH -o slurm.%j.out
-#SBATCH -e slurm.%j.err
+#SBATCH -o /scratch/szinjad/llm-sensitivity/sbatch_log/slurm.%j.out
+#SBATCH -e /scratch/szinjad/llm-sensitivity/sbatch_log/slurm.%j.err
 #SBATCH --mail-type=ALL
 
 module load mamba/latest
