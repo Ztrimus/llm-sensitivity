@@ -65,15 +65,12 @@ def generate_text(model, tokenizer, texts):
         tokenizer.pad_token = tokenizer.eos_token
         output_texts = []
         for id, text in enumerate(texts):
-            logger.info(f"\n====\n{id+1}/{len(texts)} text: {text}")
+            logger.info(f"{'='*20}\n{id+1}/{len(texts)} text: {text}")
 
             inputs = tokenizer(text, return_tensors='pt')
-       
-            logger.info("Generating responses")
             outputs = model.generate(inputs.input_ids.to(device), max_length=envs.MAX_RESPONSE_LEN, pad_token_id=tokenizer.eos_token_id)
-            logger.info(f"output: {outputs}")
             output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
-            logger.info(f"output_text: {output_text}")
+            logger.info(f"output_text: {output_text}\n\n")
             output_texts.append(output_text)
         # output_texts = [tokenizer.decode(output, skip_special_tokens=True) for output in outputs]
         return output_texts
