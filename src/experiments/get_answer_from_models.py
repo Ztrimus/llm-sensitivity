@@ -45,14 +45,14 @@ def get_model_and_tokenizer(model_config, auth_token, cache_dir):
             token = auth_token,
             cache_dir = cache_dir,
         )
-        
+
         logger.info(f"Loading model for {model_config['checkpoint']}")
         model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path = model_config['checkpoint'],
             token = auth_token,
             cache_dir = cache_dir
         ).to(device)
-        
+      
 
         return tokenizer, model
     except Exception as e:

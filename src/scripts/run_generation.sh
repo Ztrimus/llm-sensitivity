@@ -12,7 +12,7 @@
 
 module load mamba/latest
 
-source activate llm-safety
+source activate llm_safety_39
 
 cd /scratch/szinjad/llm-sensitivity
 

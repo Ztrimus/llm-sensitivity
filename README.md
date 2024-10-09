@@ -10,8 +10,7 @@
 
 ```sh
 module load mamba/latest
-source activate llm-safety
-huggingface-cli login
+source activate llm_safety_39
 ```
 
 -   Create [`credentials.py`](src/config/credentials.py) at src/config location with your personal credentials.
