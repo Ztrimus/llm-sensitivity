@@ -1,0 +1,27 @@
+
+=====================================================================
+This module is intended solely for building or source activating user
+python environments, i.e.,
+
+    mamba create -n myenv -c conda-forge
+
+or
+
+    source activate myenv
+
+To list available environments, run:
+
+    mamba info --envs
+
+See our docs: https://links.asu.edu/solpy
+
+Any other use is NOT TESTED.
+=====================================================================
+
+  
+2024-10-09 22:52:42,690 - INFO - torch.cuda.is_available(): True
+2024-10-09 22:52:42,690 - INFO - Loading dataset
+2024-10-09 22:52:44,431 - INFO - Processing model: mistral
+2024-10-09 22:52:44,432 - INFO - Loading tokenizer for mistralai/Mistral-7B-Instruct-v0.3
+2024-10-09 22:52:44,931 - INFO - Loading model for mistralai/Mistral-7B-Instruct-v0.3
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 1/3 [00:06<00:12,  6.41s/it]
