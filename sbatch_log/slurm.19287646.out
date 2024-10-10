@@ -1,2 +1,13 @@
 Function get_dataset took 1.7408 seconds to execute
 cache_dir:  /scratch/szinjad/cache/llm-sensitivity/models
+Function get_model_and_tokenizer took 28.2056 seconds to execute
+Function generate_text took 3020.6799 seconds to execute
+cache_dir:  /scratch/szinjad/cache/llm-sensitivity/models
+Function get_model_and_tokenizer took 50.6576 seconds to execute
+Function generate_text took 2755.2768 seconds to execute
+cache_dir:  /scratch/szinjad/cache/llm-sensitivity/models
+Function get_model_and_tokenizer took 59.8273 seconds to execute
+Function generate_text took 3219.4334 seconds to execute
+cache_dir:  /scratch/szinjad/cache/llm-sensitivity/models
+Function get_model_and_tokenizer took 59.4091 seconds to execute
+Function generate_text took 3243.8813 seconds to execute
