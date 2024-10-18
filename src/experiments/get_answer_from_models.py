@@ -128,6 +128,6 @@ if __name__ == '__main__':
         logger.info(f"Reading dataframe from {df_path}")
         df = pd.read_csv(df_path)
         logger.info(f"Columns: {df.columns}")
-        generate_answers(df=None, columns=['ocr_n1', 'ocr_n2', 'ocr_n3', 'ocr_n4', 'ocr_n5', 'keyboard_n1', 'keyboard_n2', 'keyboard_n3', 'keyboard_n4', 'keyboard_n5', 'random_insert_n1', 'random_insert_n2', 'random_insert_n3', 'random_insert_n4', 'random_insert_n5', 'random_substitute_n1', 'random_substitute_n2', 'random_substitute_n3', 'random_substitute_n4', 'random_substitute_n5', 'random_swap_n1', 'random_swap_n2', 'random_swap_n3', 'random_swap_n4', 'random_swap_n5', 'random_delete_n1', 'random_delete_n2', 'random_delete_n3', 'random_delete_n4', 'random_delete_n5'])
+        generate_answers(df, columns=['ocr_n1', 'ocr_n2', 'ocr_n3', 'ocr_n4', 'ocr_n5', 'keyboard_n1', 'keyboard_n2', 'keyboard_n3', 'keyboard_n4', 'keyboard_n5', 'random_insert_n1', 'random_insert_n2', 'random_insert_n3', 'random_insert_n4', 'random_insert_n5', 'random_substitute_n1', 'random_substitute_n2', 'random_substitute_n3', 'random_substitute_n4', 'random_substitute_n5', 'random_swap_n1', 'random_swap_n2', 'random_swap_n3', 'random_swap_n4', 'random_swap_n5', 'random_delete_n1', 'random_delete_n2', 'random_delete_n3', 'random_delete_n4', 'random_delete_n5'])
     except Exception as e:
         logger.error(f"An error occurred in __main__: {str(e)}")
