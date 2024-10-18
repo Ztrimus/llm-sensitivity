@@ -119,7 +119,7 @@ def generate_answers(df: pd.DataFrame = None, columns: List[str] = None):
 
 if __name__ == '__main__':
     try:
-        df_path = os.path.join(envs.REPO_DIR, 'data/CatHarmQA/CatHarmModelPeturb.csv')
+        df_path = 'data/CatHarmQA/CatHarmModelPeturb.csv'
         logger.info(f"Reading dataframe from {df_path}")
         df = pd.read_csv('df_path')
         logger.info(f"Columns: {df.columns}")
