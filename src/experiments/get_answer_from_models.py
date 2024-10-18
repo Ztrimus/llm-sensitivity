@@ -8,6 +8,7 @@ Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com
 -----------------------------------------------------------------------
 '''
 import sys
+import traceback
 from typing import List
 sys.path.append('./')
 from src.config import envs, credentials, models
@@ -96,7 +97,10 @@ def generate_answers(df: pd.DataFrame = None, columns: List[str] = None):
     try:
         if df is None:
             df = get_dataset()
+        logger.info(f"DF: \n{df.head()}")
+
         for question_col in columns:
+            logger.info(f"Processing column: {question_col}")
             questions = df[question_col].to_list()
             
             # TODO: Argument: model_name, category, subcategories, max tokens len,
@@ -110,12 +114,13 @@ def generate_answers(df: pd.DataFrame = None, columns: List[str] = None):
                 output_texts = generate_text(model, tokenizer, questions)
                 logger.info(f"Storing response in dataframe")
                 df[model_name] = output_texts
-                output_path = os.path.join(envs.DATASETS_DIR, f'answers_{model_name}_{columns}.csv')
+                output_path = os.path.join(envs.DATASETS_DIR, f'answers_{model_name}_{question_col}.csv')
                 logger.info(f"Saving results to {output_path}")
                 df.to_csv(output_path, index=False)
         logger.info("Script completed successfully")
     except Exception as e:
-        logger.error(f"An error occurred in main: {str(e)}")
+        logger.error(f"An error occurred in generate_answers: {str(e)}")
+        logger.error(traceback.format_exc())
 
 if __name__ == '__main__':
     try:
