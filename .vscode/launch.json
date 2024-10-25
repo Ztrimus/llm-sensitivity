@@ -1,0 +1,39 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "generation.py",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/generation.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"--question_columns",
+				"Question, Category, Same"
+			],
+			"justMyCode": true
+		},
+		{
+			"name": "perturbation.py",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/perturbation.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"--perturbation_level",
+				"char",
+				"--perturbation_type",
+				"ocr, keyboard",
+				"--query_columns",
+				"Question",
+				"--max_char_perturb",
+				"2"
+			],
+			"justMyCode": true
+		}
+	]
+}
