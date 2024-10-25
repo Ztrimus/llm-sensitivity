@@ -1,4 +1,4 @@
-from src.config import credentials
+from config import credentials
 
 REPO_DIR = f'/scratch/{credentials.ASURITE_ID}/llm-sensitivity'
 MODELS_DIR = f'/scratch/{credentials.ASURITE_ID}/cache/llm-sensitivity/models'
