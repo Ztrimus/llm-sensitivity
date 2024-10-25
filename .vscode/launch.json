@@ -16,7 +16,7 @@
 			"justMyCode": true
 		},
 		{
-			"name": "perturbation.py",
+			"name": "char-perturbation",
 			"type": "debugpy",
 			"request": "launch",
 			"program": "${workspaceFolder}/src/scripts/perturbation.py",
@@ -31,7 +31,45 @@
 				"--query_columns",
 				"Question",
 				"--max_char_perturb",
-				"2"
+				"5"
+			],
+			"justMyCode": true
+		},
+		{
+			"name": "word-perturbation",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/perturbation.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"--perturbation_level",
+				"word",
+				"--perturbation_type",
+				"synonym_wordnet, synonym_ppdb, spelling, random_insert_emb, random_insert_tfidf, random_insert_cwe, random_insert_emb, random_substitute_emb, random_swap_emb, random_delete_emb, random_insert_tfidf, random_substitute_tfidf, random_swap_tfidf, random_delete_tfidf, random_insert_cwe, random_substitute_cwe, random_swap_cwe, random_delete_cwe",
+				"--query_columns",
+				"Question",
+				"--max_word_perturb",
+				"5"
+			],
+			"justMyCode": true
+		},
+		{
+			"name": "sentence-perturbation",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/perturbation.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"--perturbation_level",
+				"sentence",
+				"--perturbation_type",
+				"contextual_insert",
+				"--query_columns",
+				"Question"
 			],
 			"justMyCode": true
 		}
