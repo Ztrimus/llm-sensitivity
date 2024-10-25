@@ -19,7 +19,7 @@ import pandas as pd
 import logging
 
 from src.config import envs
-from src.utils import measure_execution_time, get_dataframe
+from src.utils import measure_execution_time, get_dataframe, split_string_into_list
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -112,11 +112,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run perturbation experiments.')
     parser.add_argument('--dataset_path', type=str, default=None, help='Path to the dataset file.')
     parser.add_argument('--perturbation_level', type=str, choices=['char', 'word', 'sentence'], default='char', help='Level of perturbation to apply.')
-    parser.add_argument('--perturbation_type', type=str, choices=['ocr', 'keyboard', 'random_insert', 'random_substitute', 'random_swap', 'random_delete', 'spelling'], default='ocr', help='Type of perturbation to apply.')
+    parser.add_argument('--perturbation_type', type=str, default=None, help='Type of perturbation to apply. Example: --perturbation_type ocr, keyboard, random_insert')
     parser.add_argument('--max_char_perturb', type=int, default=5, help='Maximum number of character perturbations to make.')
-    parser.add_argument('--columns', type=str, nargs='+', default=None, help='Columns containing query to generate response for.')
+    parser.add_argument('--columns', type=str, default=None, help='Columns containing query to generate response for.')
 
     args = parser.parse_args()
+    columns = split_string_into_list(args.columns)
+    perturbation_type = split_string_into_list(args.perturbation_type)
 
     perturbed_df = perturb_questions(args.dataset_path, args.perturbation_level, args.perturbation_type, args.max_char_perturb, args.columns)
     output_path = os.path.join(envs.PERTURBED_DATA_DIR, f'{args.perturbation_level}_{args.perturbation_type}_{args.max_char_perturb}.csv')
