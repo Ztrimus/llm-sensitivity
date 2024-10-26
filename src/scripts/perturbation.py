@@ -17,6 +17,7 @@ import nlpaug.augmenter.word as naw
 import nlpaug.augmenter.sentence as nas
 import logging
 import gensim.downloader as gensim_api
+import torch
 
 from config import envs
 from utils import measure_execution_time, get_dataframe, split_string_into_list
@@ -28,6 +29,9 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+logger.info(f"Device: {device}")
 
 
 def count_differences(str1, str2, perturb_level):
@@ -74,7 +78,7 @@ def get_augmenter(
         ## ======= Sentence
         elif level == "sentence":
             if perb_type == "contextual_insert":
-                aug = nas.ContextualWordEmbsForSentenceAug(model_path="gpt2")
+                aug = nas.ContextualWordEmbsForSentenceAug(model_path="gpt2", device=device)
         ## ======= Word/Token
         elif level == "word":
             ## Spelling Augmenter
@@ -123,19 +127,19 @@ def get_augmenter(
             # TODO: model_type: bert-base-uncased, distilbert-base-uncased, roberta-base, XLNet
             elif perb_type == "random_insert_cwe":
                 aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="insert", aug_max=aug_word_max
+                    model_path="bert-base-uncased", action="insert", aug_max=aug_word_max, device=device
                 )
             elif perb_type == "random_substitute_cwe":
                 aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="substitute", aug_max=aug_word_max
+                    model_path="bert-base-uncased", action="substitute", aug_max=aug_word_max, device=device
                 )
             elif perb_type == "random_swap_cwe":
                 aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="swap", aug_max=aug_word_max
+                    model_path="bert-base-uncased", action="swap", aug_max=aug_word_max, device=device
                 )
             elif perb_type == "random_delete_cwe":
                 aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="delete", aug_max=aug_word_max
+                    model_path="bert-base-uncased", action="delete", aug_max=aug_word_max, device=device
                 )
             ## Synonym Augmenter
             elif perb_type == "synonym_wordnet":
@@ -223,7 +227,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--perturbation_type",
-        type=str,
+        type=split_string_into_list,
         default=None,
         help="Type of perturbation to apply. Example: --perturbation_type ocr, keyboard, random_insert",
     )
@@ -235,19 +239,17 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--query_columns",
-        type=str,
+        type=split_string_into_list,
         default=None,
         help="Columns containing query to generate response for.",
     )
 
     args = parser.parse_args()
-    perturbation_type = split_string_into_list(args.perturbation_type)
-    query_columns = split_string_into_list(args.query_columns)
 
     perturb_questions(
         args.dataset_path,
         args.perturbation_level,
-        perturbation_type,
+        args.perturbation_type,
         args.max_perturb,
-        query_columns,
+        args.query_columns,
     )

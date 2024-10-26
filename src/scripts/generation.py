@@ -83,8 +83,8 @@ def generate_answers(dataset_path: str = None, question_columns: List[str] = Non
             if df.empty:
                 raise ValueError("Empty DataFrame. Check dataset path or format.")
             
-            for question_col in question_columns:
-                logger.info(f"{'='*5} Processing column: {question_col}")
+            for question_index, question_col in enumerate(question_columns):
+                logger.info(f"{'='*5} Processing column {question_index+1}: {question_col}")
                 questions = df[question_col].to_list()
                 
                 # TODO: Argument: model_name, category, subcategories, max tokens len,
@@ -95,9 +95,9 @@ def generate_answers(dataset_path: str = None, question_columns: List[str] = Non
                         auth_token=credentials.HF_TOKEN,
                         cache_dir=envs.MODELS_DIR)
 
-                    # output_texts = generate_text(model, tokenizer, questions)
-                    # logger.info(f"Storing response in dataframe")
-                    # df[model_name] = output_texts
+                    output_texts = generate_text(model, tokenizer, questions)
+                    logger.info(f"Storing response in dataframe")
+                    df[model_name] = output_texts
                     output_path = os.path.join(envs.GENERATED_DATA_DIR, f'answers_{model_name}_{question_col}.csv')
                     logger.info(f"Saving results to {output_path}")
                     df.to_csv(output_path, index=False)
@@ -109,12 +109,11 @@ def generate_answers(dataset_path: str = None, question_columns: List[str] = Non
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run perturbation experiments.')
     parser.add_argument('--dataset_path', type=str, default=None, help='Path to the dataset file.')
-    parser.add_argument('--question_columns', type=str, default=None, help='Columns containing questions to generate answers for.')
+    parser.add_argument('--question_columns', type=split_string_into_list, default=None, help='Columns containing questions to generate answers for.')
 
     args = parser.parse_args()
-    question_columns = split_string_into_list(args.question_columns)
 
-    generate_answers(args.dataset_path, question_columns)
+    generate_answers(args.dataset_path, args.question_columns)
 
 
 
