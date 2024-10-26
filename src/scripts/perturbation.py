@@ -28,9 +28,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def count_differences(str1, str2):
+def count_differences(str1, str2, perturb_level):
     """Count the number of character differences between two strings."""
-    return sum(char1 != char2 for char1, char2 in zip(str1, str2))
+    if perturb_level == "char":
+        return sum(char1 != char2 for char1, char2 in zip(str1, str2))
+    elif perturb_level == "word":
+        return sum(word1 != word2 for word1, word2 in zip(str1.split(), str2.split()))
 
 
 def get_augmenter(
@@ -50,101 +53,107 @@ def get_augmenter(
     Returns:
         object: _description_
     """
-    aug = None
-    ## ======= Character
-    if level == "char":
-        if perb_type == "ocr":
-            aug = nac.OcrAug(aug_word_max=aug_word_max, aug_char_max=aug_char_max)
-        elif perb_type == "keyboard":
-            aug = nac.KeyboardAug(aug_word_max=aug_word_max, aug_char_max=aug_char_max)
-        elif perb_type == "random_insert":
-            aug = nac.RandomCharAug(action="insert")
-        elif perb_type == "random_substitute":
-            aug = nac.RandomCharAug(action="substitute")
-        elif perb_type == "random_swap":
-            aug = nac.RandomCharAug(action="swap")
-        elif perb_type == "random_delete":
-            aug = nac.RandomCharAug(action="delete")
-    ## ======= Sentence
-    elif level == "sentence":
-        if perb_type == "contextual_insert":
-            aug = nas.ContextualWordEmbsForSentenceAug(model_path="gpt2")
-    ## ======= Word/Token
-    elif level == "word":
-        ## Spelling Augmenter
-        if perb_type == "spelling":
-            aug = naw.SpellingAug()
-        ## Word Embeddings Augmenter
-        # TODO: model_type: word2vec, glove or fasttext
-        elif perb_type == "random_insert_emb":
-            aug = naw.WordEmbsAug(
-                model_type="word2vec",
-                model_path=os.path.join(
-                    envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
-                ),
-                action="insert",
-            )
-        elif perb_type == "random_substitute_emb":
-            aug = naw.WordEmbsAug(
-                model_type="word2vec",
-                model_path=os.path.join(
-                    envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
-                ),
-                action="substitute",
-            )
-        elif perb_type == "random_swap_emb":
-            aug = naw.WordEmbsAug(
-                model_type="word2vec",
-                model_path=os.path.join(
-                    envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
-                ),
-                action="swap",
-            )
-        elif perb_type == "random_delete_emb":
-            aug = naw.WordEmbsAug(
-                model_type="word2vec",
-                model_path=os.path.join(
-                    envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
-                ),
-                action="delete",
-            )
-        ## TF-IDF Augmenter
-        elif perb_type == "random_insert_tfidf":
-            aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="insert")
-        elif perb_type == "random_substitute_tfidf":
-            aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="substitute")
-        elif perb_type == "random_swap_tfidf":
-            aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="swap")
-        elif perb_type == "random_delete_tfidf":
-            aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="delete")
-        ## Contextual Word Embeddings Augmenter
-        # TODO: model_type: bert-base-uncased, distilbert-base-uncased, roberta-base, XLNet
-        elif perb_type == "random_insert_cwe":
-            aug = naw.ContextualWordEmbsAug(
-                model_path="bert-base-uncased", action="insert"
-            )
-        elif perb_type == "random_substitute_cwe":
-            aug = naw.ContextualWordEmbsAug(
-                model_path="bert-base-uncased", action="substitute"
-            )
-        elif perb_type == "random_swap_cwe":
-            aug = naw.ContextualWordEmbsAug(
-                model_path="bert-base-uncased", action="swap"
-            )
-        elif perb_type == "random_delete_cwe":
-            aug = naw.ContextualWordEmbsAug(
-                model_path="bert-base-uncased", action="delete"
-            )
-        ## Synonym Augmenter
-        elif perb_type == "synonym_wordnet":
-            aug = naw.SynonymAug(aug_src="wordnet", aug_max=aug_word_max)
-        elif perb_type == "synonym_ppdb":
-            aug = naw.SynonymAug(
-                aug_src="ppdb",
-                model_path=os.path.join(envs.MODELS_DIR, "ppdb-2.0-s-all"),
-            )
+    try:
+        aug = None
+        ## ======= Character
+        if level == "char":
+            if perb_type == "ocr":
+                aug = nac.OcrAug(aug_word_max=aug_word_max, aug_char_max=aug_char_max)
+            elif perb_type == "keyboard":
+                aug = nac.KeyboardAug(
+                    aug_word_max=aug_word_max, aug_char_max=aug_char_max
+                )
+            elif perb_type == "random_insert":
+                aug = nac.RandomCharAug(action="insert")
+            elif perb_type == "random_substitute":
+                aug = nac.RandomCharAug(action="substitute")
+            elif perb_type == "random_swap":
+                aug = nac.RandomCharAug(action="swap")
+            elif perb_type == "random_delete":
+                aug = nac.RandomCharAug(action="delete")
+        ## ======= Sentence
+        elif level == "sentence":
+            if perb_type == "contextual_insert":
+                aug = nas.ContextualWordEmbsForSentenceAug(model_path="gpt2")
+        ## ======= Word/Token
+        elif level == "word":
+            ## Spelling Augmenter
+            if perb_type == "spelling":
+                aug = naw.SpellingAug()
+            ## Word Embeddings Augmenter
+            # TODO: model_type: word2vec, glove or fasttext
+            elif perb_type == "random_insert_emb":
+                aug = naw.WordEmbsAug(
+                    model_type="word2vec",
+                    model_path=os.path.join(
+                        envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
+                    ),
+                    action="insert",
+                )
+            elif perb_type == "random_substitute_emb":
+                aug = naw.WordEmbsAug(
+                    model_type="word2vec",
+                    model_path=os.path.join(
+                        envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
+                    ),
+                    action="substitute",
+                )
+            elif perb_type == "random_swap_emb":
+                aug = naw.WordEmbsAug(
+                    model_type="word2vec",
+                    model_path=os.path.join(
+                        envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
+                    ),
+                    action="swap",
+                )
+            elif perb_type == "random_delete_emb":
+                aug = naw.WordEmbsAug(
+                    model_type="word2vec",
+                    model_path=os.path.join(
+                        envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
+                    ),
+                    action="delete",
+                )
+            ## TF-IDF Augmenter
+            elif perb_type == "random_insert_tfidf":
+                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="insert")
+            elif perb_type == "random_substitute_tfidf":
+                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="substitute")
+            elif perb_type == "random_swap_tfidf":
+                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="swap")
+            elif perb_type == "random_delete_tfidf":
+                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="delete")
+            ## Contextual Word Embeddings Augmenter
+            # TODO: model_type: bert-base-uncased, distilbert-base-uncased, roberta-base, XLNet
+            elif perb_type == "random_insert_cwe":
+                aug = naw.ContextualWordEmbsAug(
+                    model_path="bert-base-uncased", action="insert"
+                )
+            elif perb_type == "random_substitute_cwe":
+                aug = naw.ContextualWordEmbsAug(
+                    model_path="bert-base-uncased", action="substitute"
+                )
+            elif perb_type == "random_swap_cwe":
+                aug = naw.ContextualWordEmbsAug(
+                    model_path="bert-base-uncased", action="swap"
+                )
+            elif perb_type == "random_delete_cwe":
+                aug = naw.ContextualWordEmbsAug(
+                    model_path="bert-base-uncased", action="delete"
+                )
+            ## Synonym Augmenter
+            elif perb_type == "synonym_wordnet":
+                aug = naw.SynonymAug(aug_src="wordnet", aug_max=aug_word_max)
+            elif perb_type == "synonym_ppdb":
+                aug = naw.SynonymAug(
+                    aug_src="ppdb",
+                    model_path=os.path.join(envs.MODELS_DIR, "ppdb-2.0-s-all"),
+                )
 
-    return aug
+        return aug
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 
 @measure_execution_time
@@ -152,7 +161,7 @@ def perturb_questions(
     dataset_path: str = None,
     perturb_level: str = "char",
     perturb_types: List[str] = "ocr",
-    max_char_perturb: int = 5,
+    max_perturb: int = 5,
     query_columns: List[str] = None,
 ) -> pd.DataFrame:
     """Augment questions in the DataFrame with OCR changes."""
@@ -165,35 +174,39 @@ def perturb_questions(
             for perturb_type in perturb_types:
                 aug = get_augmenter(perturb_level, perturb_type)
 
-                for col in query_columns:
-                    logger.info(f"{'='*5} Processing column: {col}")
-                    query_col = df[col].to_list()
-                    query_col_len = len(query_col)
+                if aug:
+                    for col in query_columns:
+                        logger.info(f"{'='*5} Processing column: {col}")
+                        query_col = df[col].to_list()
+                        query_col_len = len(query_col)
 
-                    for i in range(1, max_char_perturb + 1):
-                        current_col = []
-                        current_col_name = f"{perturb_type}_n{i}_{col.lower()}"
-                        print(f"{'='*15} Column: {current_col_name} {'='*15}")
+                        for i in range(1, max_perturb + 1):
+                            current_col = []
+                            current_col_name = f"{perturb_type}_n{i}_{col.lower()}"
+                            print(f"{'='*15} Column: {current_col_name} {'='*15}")
 
-                        for idx, text in enumerate(query_col):
-                            print(f"{idx + 1}/{query_col_len}")
-                            augmented_text = aug.augment(text)[0]
-                            try_flag = 0
-                            while (
-                                count_differences(text, augmented_text) != i
-                                and try_flag < 10
-                            ):
+                            for idx, text in enumerate(query_col):
+                                print(f"{idx + 1}/{query_col_len}")
                                 augmented_text = aug.augment(text)[0]
-                                try_flag += 1
-                            current_col.append(augmented_text)
+                                try_flag = 0
+                                while (
+                                    count_differences(
+                                        text, augmented_text, perturb_level
+                                    )
+                                    != i
+                                    and try_flag < 10
+                                ):
+                                    augmented_text = aug.augment(text)[0]
+                                    try_flag += 1
+                                current_col.append(augmented_text)
 
-                        df[current_col_name] = current_col
+                            df[current_col_name] = current_col
 
-                output_path = os.path.join(
-                    envs.PERTURBED_DATA_DIR,
-                    f"{perturb_level}_{perturb_type}_n_max{max_char_perturb}.csv",
-                )
-                df.to_csv(output_path, index=False)
+                    output_path = os.path.join(
+                        envs.PERTURBED_DATA_DIR,
+                        f"{perturb_level}_{perturb_type}_n_max{max_perturb}.csv",
+                    )
+                    df.to_csv(output_path, index=False)
     except Exception as e:
         print(f"Error: {e}")
 
@@ -217,7 +230,7 @@ if __name__ == "__main__":
         help="Type of perturbation to apply. Example: --perturbation_type ocr, keyboard, random_insert",
     )
     parser.add_argument(
-        "--max_char_perturb",
+        "--max_perturb",
         type=int,
         default=5,
         help="Maximum number of character perturbations to make.",
@@ -237,6 +250,6 @@ if __name__ == "__main__":
         args.dataset_path,
         args.perturbation_level,
         perturbation_type,
-        args.max_char_perturb,
+        args.max_perturb,
         query_columns,
     )

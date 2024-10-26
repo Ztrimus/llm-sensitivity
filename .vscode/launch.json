@@ -30,7 +30,7 @@
 				"ocr, keyboard",
 				"--query_columns",
 				"Question",
-				"--max_char_perturb",
+				"--max_perturb",
 				"5"
 			],
 			"justMyCode": true
@@ -43,14 +43,14 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"/Users/saurabh/AA/convergent/projects/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
 				"--perturbation_level",
 				"word",
 				"--perturbation_type",
-				"synonym_wordnet, synonym_ppdb, spelling, random_insert_emb, random_insert_tfidf, random_insert_cwe, random_insert_emb, random_substitute_emb, random_swap_emb, random_delete_emb, random_insert_tfidf, random_substitute_tfidf, random_swap_tfidf, random_delete_tfidf, random_insert_cwe, random_substitute_cwe, random_swap_cwe, random_delete_cwe",
+				"random_insert_tfidf, random_insert_cwe, random_insert_emb, synonym_wordnet, spelling, random_substitute_emb, random_swap_emb, random_delete_emb, random_insert_tfidf, random_substitute_tfidf, random_swap_tfidf, random_delete_tfidf, random_insert_cwe, random_substitute_cwe, random_swap_cwe, random_delete_cwe, synonym_ppdb",
 				"--query_columns",
 				"Question",
-				"--max_word_perturb",
+				"--max_perturb",
 				"5"
 			],
 			"justMyCode": true
