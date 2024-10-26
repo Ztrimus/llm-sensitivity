@@ -1,16 +1,77 @@
 {
-	// Use IntelliSense to learn about possible attributes.
-	// Hover to view descriptions of existing attributes.
-	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Python Debugger: Current File",
+			"name": "generation.py",
 			"type": "debugpy",
 			"request": "launch",
-			"program": "${file}",
+			"program": "${workspaceFolder}/src/scripts/generation.py",
 			"console": "integratedTerminal",
-			"justMyCode": false
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"--question_columns",
+				"Question, Category, Same"
+			],
+			"justMyCode": true
+		},
+		{
+			"name": "char-perturbation",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/perturbation.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"--perturbation_level",
+				"char",
+				"--perturbation_type",
+				"ocr, keyboard",
+				"--query_columns",
+				"Question",
+				"--max_perturb",
+				"5"
+			],
+			"justMyCode": true
+		},
+		{
+			"name": "word-perturbation",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/perturbation.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"--perturbation_level",
+				"word",
+				"--perturbation_type",
+				"random_insert_tfidf, synonym_wordnet, spelling, random_insert_cwe, random_substitute_cwe, random_swap_cwe, random_delete_cwe, random_insert_emb, random_substitute_emb, random_swap_emb, random_delete_emb, random_insert_tfidf, random_substitute_tfidf, random_swap_tfidf, random_delete_tfidf, synonym_ppdb",
+				"--query_columns",
+				"Question",
+				"--max_perturb",
+				"5"
+			],
+			"justMyCode": true
+		},
+		{
+			"name": "sentence-perturbation",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/perturbation.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"--perturbation_level",
+				"sentence",
+				"--perturbation_type",
+				"contextual_insert",
+				"--query_columns",
+				"Question"
+			],
+			"justMyCode": true
 		}
 	]
 }

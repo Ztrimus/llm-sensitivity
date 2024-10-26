@@ -17,4 +17,12 @@ source activate llm_safety_39
 
 ```python
 ASURITE_ID = "YOUR_ASURITE_ID"
+HF_TOKEN ="PUT_HF_TOKEN_HERE"
+```
+
+-   to make src contains importable
+
+```sh
+cd llm-sensitivity
+export PYTHONPATH=$(pwd)/src
 ```
