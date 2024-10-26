@@ -95,9 +95,9 @@ def generate_answers(dataset_path: str = None, question_columns: List[str] = Non
                         auth_token=credentials.HF_TOKEN,
                         cache_dir=envs.MODELS_DIR)
 
-                    # output_texts = generate_text(model, tokenizer, questions)
-                    # logger.info(f"Storing response in dataframe")
-                    # df[model_name] = output_texts
+                    output_texts = generate_text(model, tokenizer, questions)
+                    logger.info(f"Storing response in dataframe")
+                    df[model_name] = output_texts
                     output_path = os.path.join(envs.GENERATED_DATA_DIR, f'answers_{model_name}_{question_col}.csv')
                     logger.info(f"Saving results to {output_path}")
                     df.to_csv(output_path, index=False)

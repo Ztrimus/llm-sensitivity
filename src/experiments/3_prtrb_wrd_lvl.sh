@@ -6,8 +6,8 @@
 #SBATCH -t 12:00:00
 #SBATCH --gres=gpu:a100:1
 #SBATCH --mem=80G
-#SBATCH -o /scratch/szinjad/llm-sensitivity/sbatch_log/slurm.%j.out
-#SBATCH -e /scratch/szinjad/llm-sensitivity/sbatch_log/slurm.%j.err
+#SBATCH -o /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.out
+#SBATCH -e /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.err
 #SBATCH --mail-type=ALL
 
 module load mamba/latest
