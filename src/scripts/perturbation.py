@@ -8,6 +8,7 @@ Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com
 -----------------------------------------------------------------------
 """
 
+import shutil
 import argparse
 from typing import List
 import pandas as pd
@@ -15,6 +16,7 @@ import nlpaug.augmenter.char as nac
 import nlpaug.augmenter.word as naw
 import nlpaug.augmenter.sentence as nas
 import logging
+import gensim.downloader as gensim_api
 
 from config import envs
 from utils import measure_execution_time, get_dataframe, split_string_into_list
@@ -83,13 +85,16 @@ def get_augmenter(
             ## Word Embeddings Augmenter
             # TODO: model_type: word2vec, glove or fasttext
             elif perb_type == "random_insert_emb":
-                aug = naw.WordEmbsAug(
-                    model_type="word2vec",
-                    model_path=os.path.join(
-                        envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
-                    ),
-                    action="insert",
-                )
+                emb_model = "word2vec-google-news-300"
+                model = gensim_api.load(emb_model)
+                # emb_path = os.path.join(envs.MODELS_DIR, emb_model)
+                # if not os.path.exists(emb_path):
+                #     src_path = gensim_api.load(emb_model, return_path=True)
+                #     shutil.move(src_path, emb_path)
+                
+                aug = naw.WordEmbsAug(model_type="word2vec", model=model, action="insert" )
+
+                
             elif perb_type == "random_substitute_emb":
                 aug = naw.WordEmbsAug(
                     model_type="word2vec",
