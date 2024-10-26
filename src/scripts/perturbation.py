@@ -85,16 +85,8 @@ def get_augmenter(
             ## Word Embeddings Augmenter
             # TODO: model_type: word2vec, glove or fasttext
             elif perb_type == "random_insert_emb":
-                emb_model = "word2vec-google-news-300"
-                model = gensim_api.load(emb_model)
-                # emb_path = os.path.join(envs.MODELS_DIR, emb_model)
-                # if not os.path.exists(emb_path):
-                #     src_path = gensim_api.load(emb_model, return_path=True)
-                #     shutil.move(src_path, emb_path)
-                
-                aug = naw.WordEmbsAug(model_type="word2vec", model=model, action="insert" )
-
-                
+                model_path = gensim_api.load("word2vec-google-news-300", return_path=True)
+                aug = naw.WordEmbsAug(model_type="word2vec", model_path=model_path, action="insert" )
             elif perb_type == "random_substitute_emb":
                 aug = naw.WordEmbsAug(
                     model_type="word2vec",
