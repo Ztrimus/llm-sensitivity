@@ -62,17 +62,15 @@ def get_augmenter(
             if perb_type == "ocr":
                 aug = nac.OcrAug(aug_word_max=aug_word_max, aug_char_max=aug_char_max)
             elif perb_type == "keyboard":
-                aug = nac.KeyboardAug(
-                    aug_word_max=aug_word_max, aug_char_max=aug_char_max
-                )
+                aug = nac.KeyboardAug(aug_word_max=aug_word_max, aug_char_max=aug_char_max)
             elif perb_type == "random_insert":
-                aug = nac.RandomCharAug(action="insert")
+                aug = nac.RandomCharAug(action="insert", aug_word_max=aug_word_max, aug_char_max=aug_char_max)
             elif perb_type == "random_substitute":
-                aug = nac.RandomCharAug(action="substitute")
+                aug = nac.RandomCharAug(action="substitute", aug_word_max=aug_word_max, aug_char_max=aug_char_max)
             elif perb_type == "random_swap":
-                aug = nac.RandomCharAug(action="swap")
+                aug = nac.RandomCharAug(action="swap", aug_word_max=aug_word_max, aug_char_max=aug_char_max)
             elif perb_type == "random_delete":
-                aug = nac.RandomCharAug(action="delete")
+                aug = nac.RandomCharAug(action="delete", aug_word_max=aug_word_max, aug_char_max=aug_char_max)
         ## ======= Sentence
         elif level == "sentence":
             if perb_type == "contextual_insert":
@@ -81,62 +79,63 @@ def get_augmenter(
         elif level == "word":
             ## Spelling Augmenter
             if perb_type == "spelling":
-                aug = naw.SpellingAug()
+                aug = naw.SpellingAug(aug_max=aug_word_max)
             ## Word Embeddings Augmenter
             # TODO: model_type: word2vec, glove or fasttext
             elif perb_type == "random_insert_emb":
-                model_path = gensim_api.load("word2vec-google-news-300", return_path=True)
-                aug = naw.WordEmbsAug(model_type="word2vec", model_path=model_path, action="insert" )
+                aug = naw.WordEmbsAug(
+                    model_type="word2vec",
+                    model_path=gensim_api.load("word2vec-google-news-300", return_path=True),
+                    action="insert",
+                    aug_max=aug_word_max
+                )
             elif perb_type == "random_substitute_emb":
                 aug = naw.WordEmbsAug(
                     model_type="word2vec",
-                    model_path=os.path.join(
-                        envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
-                    ),
+                    model_path=gensim_api.load("word2vec-google-news-300", return_path=True),
                     action="substitute",
+                    aug_max=aug_word_max
                 )
             elif perb_type == "random_swap_emb":
                 aug = naw.WordEmbsAug(
                     model_type="word2vec",
-                    model_path=os.path.join(
-                        envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
-                    ),
+                    model_path=gensim_api.load("word2vec-google-news-300", return_path=True),
                     action="swap",
+                    aug_max=aug_word_max
                 )
             elif perb_type == "random_delete_emb":
                 aug = naw.WordEmbsAug(
                     model_type="word2vec",
-                    model_path=os.path.join(
-                        envs.MODELS_DIR, "GoogleNews-vectors-negative300.bin"
-                    ),
+                    model_path=gensim_api.load("word2vec-google-news-300", return_path=True),
                     action="delete",
+                    aug_max=aug_word_max
                 )
             ## TF-IDF Augmenter
             elif perb_type == "random_insert_tfidf":
-                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="insert")
+                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="insert", aug_max=aug_word_max)
             elif perb_type == "random_substitute_tfidf":
-                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="substitute")
+                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="substitute", aug_max=aug_word_max)
             elif perb_type == "random_swap_tfidf":
-                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="swap")
+                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="swap", aug_max=aug_word_max)
             elif perb_type == "random_delete_tfidf":
-                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="delete")
+                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="delete", aug_max=aug_word_max)
             ## Contextual Word Embeddings Augmenter
             # TODO: model_type: bert-base-uncased, distilbert-base-uncased, roberta-base, XLNet
             elif perb_type == "random_insert_cwe":
                 aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="insert"
+                    model_path="bert-base-uncased", action="insert", aug_max=aug_word_max
                 )
             elif perb_type == "random_substitute_cwe":
                 aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="substitute"
+                    model_path="bert-base-uncased", action="substitute", aug_max=aug_word_max
                 )
             elif perb_type == "random_swap_cwe":
                 aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="swap"
+                    model_path="bert-base-uncased", action="swap", aug_max=aug_word_max
                 )
             elif perb_type == "random_delete_cwe":
                 aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="delete"
+                    model_path="bert-base-uncased", action="delete", aug_max=aug_word_max
                 )
             ## Synonym Augmenter
             elif perb_type == "synonym_wordnet":
@@ -145,6 +144,7 @@ def get_augmenter(
                 aug = naw.SynonymAug(
                     aug_src="ppdb",
                     model_path=os.path.join(envs.MODELS_DIR, "ppdb-2.0-s-all"),
+                    aug_max=aug_word_max
                 )
 
         return aug
@@ -168,16 +168,17 @@ def perturb_questions(
             if df.empty:
                 raise ValueError("Empty DataFrame. Check dataset path or format.")
 
-            for perturb_type in perturb_types:
-                aug = get_augmenter(perturb_level, perturb_type)
+    
+            for col in query_columns:
+                logger.info(f"{'='*5} Processing column: {col}")
+                query_col = df[col].to_list()
+                query_col_len = len(query_col)
 
-                if aug:
-                    for col in query_columns:
-                        logger.info(f"{'='*5} Processing column: {col}")
-                        query_col = df[col].to_list()
-                        query_col_len = len(query_col)
+                for i in range(1, max_perturb + 1):
+                    for perturb_type in perturb_types:
+                        aug = get_augmenter(perturb_level, perturb_type, aug_char_max=i, aug_word_max=i)
 
-                        for i in range(1, max_perturb + 1):
+                        if aug:
                             current_col = []
                             current_col_name = f"{perturb_type}_n{i}_{col.lower()}"
                             print(f"{'='*15} Column: {current_col_name} {'='*15}")
@@ -199,11 +200,11 @@ def perturb_questions(
 
                             df[current_col_name] = current_col
 
-                    output_path = os.path.join(
-                        envs.PERTURBED_DATA_DIR,
-                        f"{perturb_level}_{perturb_type}_n_max{max_perturb}.csv",
-                    )
-                    df.to_csv(output_path, index=False)
+            output_path = os.path.join(
+                envs.PERTURBED_DATA_DIR,
+                f"{perturb_level}_{perturb_type}_n_max{max_perturb}.csv",
+            )
+            df.to_csv(output_path, index=False)
     except Exception as e:
         print(f"Error: {e}")
 
