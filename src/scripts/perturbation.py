@@ -7,9 +7,8 @@ Developer Email: saurabhzinjad@gmail.com
 Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
 -----------------------------------------------------------------------
 """
-
+import os
 from pathlib import Path
-import shutil
 import argparse
 import traceback
 from typing import List
@@ -20,17 +19,19 @@ import nlpaug.augmenter.sentence as nas
 import logging
 import gensim.downloader as gensim_api
 import torch
+import nltk
 
 from config import envs
 from utils import measure_execution_time, get_dataframe, split_string_into_list
-
-import os
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+nltk.download('averaged_perceptron_tagger')
+nltk.download('averaged_perceptron_tagger_eng')
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 logger.info(f"Device: {device}")

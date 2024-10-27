@@ -1,0 +1,26 @@
+=============== Column: Question_word_synonym_wordnet_n1 ===============
+1/550
+Error: 
+**********************************************************************
+  Resource [93maveraged_perceptron_tagger_eng[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('averaged_perceptron_tagger_eng')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtaggers/averaged_perceptron_tagger_eng/[0m
+
+  Searched in:
+    - '/home/szinjad/nltk_data'
+    - '/home/szinjad/.conda/envs/llm_safety_39/nltk_data'
+    - '/home/szinjad/.conda/envs/llm_safety_39/share/nltk_data'
+    - '/home/szinjad/.conda/envs/llm_safety_39/lib/nltk_data'
+    - '/usr/share/nltk_data'
+    - '/usr/local/share/nltk_data'
+    - '/usr/lib/nltk_data'
+    - '/usr/local/lib/nltk_data'
+**********************************************************************
+
+Function perturb_questions took 2.6403 seconds to execute

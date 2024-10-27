@@ -14,4 +14,5 @@ module load mamba/latest
 source deactivate
 source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
+export PYTHONPATH=$(pwd)/src
 python3 src/scripts/perturbation.py --dataset_path /scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv --perturbation_level char --perturbation_type ocr,keyboard,random_insert,random_substitute,random_swap,random_delete --max_perturb 5 --query_columns Question
