@@ -88,7 +88,7 @@ def get_augmenter(
             if perb_type == "spelling":
                 aug = naw.SpellingAug(aug_max=aug_word_max)
             ## Word Embeddings Augmenter
-            # TODO: model_type: word2vec, glove or fasttext
+            # TODO: model_type: word2vec, glove or fasttext, discuss with mentor about the model
             elif perb_type == "random_insert_emb":
                 aug = naw.WordEmbsAug(
                     model_type="word2vec",
