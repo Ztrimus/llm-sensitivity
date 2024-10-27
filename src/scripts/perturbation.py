@@ -8,6 +8,7 @@ Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com
 -----------------------------------------------------------------------
 """
 
+from pathlib import Path
 import shutil
 import argparse
 from typing import List
@@ -184,7 +185,7 @@ def perturb_questions(
 
                         if aug:
                             current_col = []
-                            current_col_name = f"{perturb_type}_n{i}_{col.lower()}"
+                            current_col_name = f"{col}_{perturb_level}_{perturb_type}_n{i}"
                             print(f"{'='*15} Column: {current_col_name} {'='*15}")
 
                             for idx, text in enumerate(query_col):
@@ -206,7 +207,7 @@ def perturb_questions(
 
             output_path = os.path.join(
                 envs.PERTURBED_DATA_DIR,
-                f"{perturb_level}_{perturb_type}_n_max{max_perturb}.csv",
+                f"{Path(dataset_path).stem}_{perturb_level}_nmax{max_perturb}.csv",
             )
             df.to_csv(output_path, index=False)
     except Exception as e:

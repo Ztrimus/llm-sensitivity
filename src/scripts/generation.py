@@ -15,6 +15,7 @@ import traceback
 from typing import List
 from utils import get_dataframe, split_string_into_list, measure_execution_time
 from config import envs, credentials, models
+from pathlib import Path
 
 import torch
 import pandas as pd
@@ -78,30 +79,31 @@ def generate_text(model, tokenizer, texts):
 
 def generate_answers(dataset_path: str = None, question_columns: List[str] = None):
     try:
-        if dataset_path:
-            df = get_dataframe(dataset_path)
-            if df.empty:
-                raise ValueError("Empty DataFrame. Check dataset path or format.")
-            
-            for question_index, question_col in enumerate(question_columns):
-                logger.info(f"{'='*5} Processing column {question_index+1}: {question_col}")
-                questions = df[question_col].to_list()
+        # TODO: Argument: model_name, category, subcategories, max tokens len,
+        for model_name, model_config in models.Config.items():
+            if dataset_path:
+                df = get_dataframe(dataset_path)
+                if df.empty:
+                    raise ValueError("Empty DataFrame. Check dataset path or format.")
                 
-                # TODO: Argument: model_name, category, subcategories, max tokens len,
-                for model_name, model_config in models.Config.items():
-                    logger.info(f"{'='*10} Processing model: {model_name}")
-                    tokenizer, model = get_model_and_tokenizer(
-                        model_config=model_config,
-                        auth_token=credentials.HF_TOKEN,
-                        cache_dir=envs.MODELS_DIR)
+                logger.info(f"{'='*10} Processing model: {model_name}")
+                tokenizer, model = get_model_and_tokenizer(
+                    model_config=model_config,
+                    auth_token=credentials.HF_TOKEN,
+                    cache_dir=envs.MODELS_DIR)
+                
+                for question_index, question_col in enumerate(question_columns):
+                    logger.info(f"{'='*5} Processing column {question_index+1}: {question_col}")
+                    questions = df[question_col].to_list()
 
                     output_texts = generate_text(model, tokenizer, questions)
                     logger.info(f"Storing response in dataframe")
-                    df[model_name] = output_texts
-                    output_path = os.path.join(envs.GENERATED_DATA_DIR, f'answers_{model_name}_{question_col}.csv')
+                    new_col_name = f"{question_col}_{model_name}"
+                    df[new_col_name] = output_texts
+                    output_path = os.path.join(envs.GENERATED_DATA_DIR, f'{Path(dataset_path).stem}_{model_name}_{question_col}.csv')
                     logger.info(f"Saving results to {output_path}")
                     df.to_csv(output_path, index=False)
-            logger.info("Script completed successfully")
+                logger.info("Script completed successfully")
     except Exception as e:
         logger.error(f"An error occurred in generate_answers: {str(e)}")
         logger.error(traceback.format_exc())

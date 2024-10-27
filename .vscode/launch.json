@@ -9,7 +9,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--question_columns",
 				"Question, Category, Same"
 			],
@@ -23,7 +23,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--perturbation_level",
 				"char",
 				"--perturbation_type",
@@ -43,7 +43,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--perturbation_level",
 				"word",
 				"--perturbation_type",
@@ -63,7 +63,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv",
+				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--perturbation_level",
 				"sentence",
 				"--perturbation_type",

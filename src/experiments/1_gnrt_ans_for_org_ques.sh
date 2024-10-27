@@ -14,4 +14,4 @@ module load mamba/latest
 source deactivate
 source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
-python3 src/scripts/generation.py --dataset_path /scratch/szinjad/llm-sensitivity/data/original/catHarmQA/data_catqa_english.csv --question_columns Question
+python3 src/scripts/generation.py --dataset_path /scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv --question_columns Question
