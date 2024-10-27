@@ -119,10 +119,6 @@ def get_augmenter(
                 aug = naw.ContextualWordEmbsAug(
                     model_path="bert-base-uncased", action="substitute", aug_max=aug_word_max, device=device
                 )
-            elif perb_type == "random_delete_cwe":
-                aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="delete", aug_max=aug_word_max, device=device
-                )
             ## Synonym Augmenter
             elif perb_type == "synonym_wordnet":
                 aug = naw.SynonymAug(aug_src="wordnet", aug_max=aug_word_max)
