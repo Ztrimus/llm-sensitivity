@@ -11,6 +11,7 @@ Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com
 from pathlib import Path
 import shutil
 import argparse
+import traceback
 from typing import List
 import pandas as pd
 import nlpaug.augmenter.char as nac
@@ -101,29 +102,12 @@ def get_augmenter(
                     action="substitute",
                     aug_max=aug_word_max
                 )
-            elif perb_type == "random_swap_emb":
-                aug = naw.WordEmbsAug(
-                    model_type="word2vec",
-                    model_path=gensim_api.load("word2vec-google-news-300", return_path=True),
-                    action="swap",
-                    aug_max=aug_word_max
-                )
-            elif perb_type == "random_delete_emb":
-                aug = naw.WordEmbsAug(
-                    model_type="word2vec",
-                    model_path=gensim_api.load("word2vec-google-news-300", return_path=True),
-                    action="delete",
-                    aug_max=aug_word_max
-                )
             ## TF-IDF Augmenter
             elif perb_type == "random_insert_tfidf":
                 aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="insert", aug_max=aug_word_max)
             elif perb_type == "random_substitute_tfidf":
                 aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="substitute", aug_max=aug_word_max)
-            elif perb_type == "random_swap_tfidf":
-                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="swap", aug_max=aug_word_max)
-            elif perb_type == "random_delete_tfidf":
-                aug = naw.TfIdfAug(model_path=envs.MODELS_DIR, action="delete", aug_max=aug_word_max)
+                
             ## Contextual Word Embeddings Augmenter
             # TODO: model_type: bert-base-uncased, distilbert-base-uncased, roberta-base, XLNet
             elif perb_type == "random_insert_cwe":
@@ -133,10 +117,6 @@ def get_augmenter(
             elif perb_type == "random_substitute_cwe":
                 aug = naw.ContextualWordEmbsAug(
                     model_path="bert-base-uncased", action="substitute", aug_max=aug_word_max, device=device
-                )
-            elif perb_type == "random_swap_cwe":
-                aug = naw.ContextualWordEmbsAug(
-                    model_path="bert-base-uncased", action="swap", aug_max=aug_word_max, device=device
                 )
             elif perb_type == "random_delete_cwe":
                 aug = naw.ContextualWordEmbsAug(
@@ -154,7 +134,8 @@ def get_augmenter(
 
         return aug
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
+        logger.info(traceback.format_exc())
         return None
 
 
@@ -207,7 +188,7 @@ def perturb_questions(
 
             output_path = os.path.join(
                 envs.PERTURBED_DATA_DIR,
-                f"{Path(dataset_path).stem}_{perturb_level}_nmax{max_perturb}.csv",
+                f"{Path(dataset_path).stem}_{perturb_level}.csv",
             )
             df.to_csv(output_path, index=False)
     except Exception as e:

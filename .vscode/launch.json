@@ -47,7 +47,7 @@
 				"--perturbation_level",
 				"word",
 				"--perturbation_type",
-				"random_insert_tfidf, synonym_wordnet, spelling, random_insert_cwe, random_substitute_cwe, random_swap_cwe, random_delete_cwe, random_insert_emb, random_substitute_emb, random_swap_emb, random_delete_emb, random_insert_tfidf, random_substitute_tfidf, random_swap_tfidf, random_delete_tfidf, synonym_ppdb",
+				"random_insert_tfidf, synonym_wordnet, spelling, random_insert_cwe, random_substitute_cwe, random_delete_cwe, random_insert_emb, random_substitute_emb, random_insert_tfidf, random_substitute_tfidf, random_delete_tfidf, synonym_ppdb",
 				"--query_columns",
 				"Question",
 				"--max_perturb",

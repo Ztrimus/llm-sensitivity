@@ -1,0 +1,44 @@
+
+=====================================================================
+This module is intended solely for building or source activating user
+python environments, i.e.,
+
+    mamba create -n myenv -c conda-forge
+
+or
+
+    source activate myenv
+
+To list available environments, run:
+
+    mamba info --envs
+
+See our docs: https://links.asu.edu/solpy
+
+Any other use is NOT TESTED.
+=====================================================================
+
+  
+2024-10-26 23:05:06,476 - INFO - Device: cuda
+2024-10-26 23:05:06,493 - INFO - ===== Processing column: Question
+2024-10-26 23:05:06,493 - ERROR - Error: Missed nltk library. Install nltk by `pip install nltk`
+2024-10-26 23:05:06,495 - INFO - Traceback (most recent call last):
+  File "/home/szinjad/.conda/envs/llm_safety_39/lib/python3.9/site-packages/nlpaug/model/word_dict/wordnet.py", line 19, in __init__
+    import nltk
+ModuleNotFoundError: No module named 'nltk'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/scratch/szinjad/llm-sensitivity/src/scripts/perturbation.py", line 127, in get_augmenter
+    aug = naw.SynonymAug(aug_src="wordnet", aug_max=aug_word_max)
+  File "/home/szinjad/.conda/envs/llm_safety_39/lib/python3.9/site-packages/nlpaug/augmenter/word/synonym.py", line 66, in __init__
+    self.model = self.get_model(aug_src, lang, model_path, force_reload)
+  File "/home/szinjad/.conda/envs/llm_safety_39/lib/python3.9/site-packages/nlpaug/augmenter/word/synonym.py", line 163, in get_model
+    return nmw.WordNet(lang=lang, is_synonym=True)
+  File "/home/szinjad/.conda/envs/llm_safety_39/lib/python3.9/site-packages/nlpaug/model/word_dict/wordnet.py", line 22, in __init__
+    raise ModuleNotFoundError('Missed nltk library. Install nltk by `pip install nltk`')
+ModuleNotFoundError: Missed nltk library. Install nltk by `pip install nltk`
+
+/home/szinjad/.conda/envs/llm_safety_39/lib/python3.9/site-packages/transformers/tokenization_utils_base.py:1601: FutureWarning: `clean_up_tokenization_spaces` was not set. It will be set to `True` by default. This behavior will be depracted in transformers v4.45, and will be then set to `False` by default. For more details check this issue: https://github.com/huggingface/transformers/issues/31884
+  warnings.warn(
