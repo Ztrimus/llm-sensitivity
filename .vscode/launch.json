@@ -11,7 +11,9 @@
 				"--dataset_path",
 				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--question_columns",
-				"Question, Category, Same"
+				"Question, Category, Same",
+				"--model",
+				"llama3"
 			],
 			"justMyCode": true
 		},

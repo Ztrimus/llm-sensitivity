@@ -1,4 +1,4 @@
-'''
+"""
 -----------------------------------------------------------------------
 File: scripts/generation.py
 Creation Time: Oct 23rd 2024, 6:34 pm
@@ -6,7 +6,7 @@ Author: Saurabh Zinjad
 Developer Email: saurabhzinjad@gmail.com
 Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
 -----------------------------------------------------------------------
-'''
+"""
 
 import os
 
@@ -23,13 +23,16 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import logging
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 logger.info(f"Device: {device}")
 
-main_columns = ['Category', 'Subcategory', 'Question']
+main_columns = ["Category", "Subcategory", "Question"]
+
 
 def get_model_and_tokenizer(model_config, auth_token, cache_dir):
     """Loads a pre-trained model and tokenizer for causal language modeling.
@@ -45,22 +48,23 @@ def get_model_and_tokenizer(model_config, auth_token, cache_dir):
         print("cache_dir: ", cache_dir)
         logger.info(f"Loading tokenizer for {model_config['checkpoint']}")
         tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model_name_or_path = model_config['checkpoint'],
-            token = auth_token,
-            cache_dir = cache_dir,
+            pretrained_model_name_or_path=model_config["checkpoint"],
+            token=auth_token,
+            cache_dir=cache_dir,
         )
 
         logger.info(f"Loading model for {model_config['checkpoint']}")
         model = AutoModelForCausalLM.from_pretrained(
-            pretrained_model_name_or_path = model_config['checkpoint'],
-            token = auth_token,
-            cache_dir = cache_dir
+            pretrained_model_name_or_path=model_config["checkpoint"],
+            token=auth_token,
+            cache_dir=cache_dir,
         ).to(device)
 
         return tokenizer, model
     except Exception as e:
         logger.error(f"Error loading model and tokenizer: {str(e)}")
         raise
+
 
 @measure_execution_time
 def generate_text(model, tokenizer, texts):
@@ -70,8 +74,12 @@ def generate_text(model, tokenizer, texts):
         for id, text in enumerate(texts):
             logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
 
-            inputs = tokenizer(text, return_tensors='pt')
-            outputs = model.generate(inputs.input_ids.to(device), max_length=envs.MAX_RESPONSE_LEN, pad_token_id=tokenizer.eos_token_id)
+            inputs = tokenizer(text, return_tensors="pt")
+            outputs = model.generate(
+                inputs.input_ids.to(device),
+                max_length=envs.MAX_RESPONSE_LEN,
+                pad_token_id=tokenizer.eos_token_id,
+            )
             output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
             output_texts.append(output_text)
         return output_texts
@@ -79,48 +87,66 @@ def generate_text(model, tokenizer, texts):
         logger.error(f"Error generating text: {str(e)}")
         return None
 
-def generate_answers(dataset_path: str = None, question_columns: List[str] = None):
+
+def generate_answers(
+    dataset_path: str = None, question_columns: List[str] = None, model: str = None
+):
     try:
         # TODO: Argument: model_name, category, subcategories, max tokens len,
-        for model_name, model_config in models.Config.items():    
-            logger.info(f"{'='*10} Processing model: {model_name}")
-            tokenizer, model = get_model_and_tokenizer(
-                model_config=model_config,
-                auth_token=credentials.HF_TOKEN,
-                cache_dir=envs.MODELS_DIR)
-            
-            for question_index, question_col in enumerate(question_columns):
-                if dataset_path:
-                    df = get_dataframe(dataset_path)
-                    if df.empty:
-                        raise ValueError("Empty DataFrame. Check dataset path or format.")
-                    logger.info(f"{'='*5} Processing column {question_index+1}: {question_col}")
-                    questions = df[question_col].to_list()
+        model_name, model_config = models.Config[model]
+        logger.info(f"{'='*10} Processing model: {model_name}")
+        tokenizer, model = get_model_and_tokenizer(
+            model_config=model_config,
+            auth_token=credentials.HF_TOKEN,
+            cache_dir=envs.MODELS_DIR,
+        )
 
-                    output_texts = generate_text(model, tokenizer, questions)
-                    logger.info(f"Storing response in dataframe")
-                    new_col_name = f"{question_col}_{model_name}"
-                    df[new_col_name] = output_texts
-                    
-                    df = df[main_columns + [question_col, new_col_name]]
-                    output_path = os.path.join(envs.GENERATED_DATA_DIR, f'{Path(dataset_path).stem}_{model_name}_{question_col}.csv')
-                    logger.info(f"Saving results to {output_path}")
-                    df.to_csv(output_path, index=False)
-            logger.info("Script completed successfully")
+        for question_index, question_col in enumerate(question_columns):
+            if dataset_path:
+                df = get_dataframe(dataset_path)
+                if df.empty:
+                    raise ValueError("Empty DataFrame. Check dataset path or format.")
+                logger.info(
+                    f"{'='*5} Processing column {question_index+1}: {question_col}"
+                )
+                questions = df[question_col].to_list()
+
+                output_texts = generate_text(model, tokenizer, questions)
+                logger.info(f"Storing response in dataframe")
+                new_col_name = f"{question_col}_{model_name}"
+                df[new_col_name] = output_texts
+
+                df = df[main_columns + [question_col, new_col_name]]
+                output_path = os.path.join(
+                    envs.GENERATED_DATA_DIR,
+                    f"{Path(dataset_path).stem}_{model_name}_{question_col}.csv",
+                )
+                logger.info(f"Saving results to {output_path}")
+                df.to_csv(output_path, index=False)
+        logger.info("Script completed successfully")
     except Exception as e:
         logger.error(f"An error occurred in generate_answers: {str(e)}")
         logger.error(traceback.format_exc())
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Run perturbation experiments.')
-    parser.add_argument('--dataset_path', type=str, default=None, help='Path to the dataset file.')
-    parser.add_argument('--question_columns', type=split_string_into_list, default=None, help='Columns containing questions to generate answers for.')
+    parser = argparse.ArgumentParser(description="Run perturbation experiments.")
+    parser.add_argument(
+        "--dataset_path", type=str, default=None, help="Path to the dataset file."
+    )
+    parser.add_argument(
+        "--model", type=str, default="llama31", help="Model to use for text generation."
+    )
+    parser.add_argument(
+        "--question_columns",
+        type=split_string_into_list,
+        default=None,
+        help="Columns containing questions to generate answers for.",
+    )
 
     args = parser.parse_args()
 
-    generate_answers(args.dataset_path, args.question_columns)
-
-
+    generate_answers(args.dataset_path, args.question_columns, args.model)
 
 
 # try:
