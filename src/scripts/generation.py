@@ -29,6 +29,8 @@ logger = logging.getLogger(__name__)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 logger.info(f"Device: {device}")
 
+main_columns = ['Category', 'Subcategory', 'Question']
+
 def get_model_and_tokenizer(model_config, auth_token, cache_dir):
     """Loads a pre-trained model and tokenizer for causal language modeling.
     Args:
@@ -80,19 +82,18 @@ def generate_text(model, tokenizer, texts):
 def generate_answers(dataset_path: str = None, question_columns: List[str] = None):
     try:
         # TODO: Argument: model_name, category, subcategories, max tokens len,
-        for model_name, model_config in models.Config.items():
-            if dataset_path:
-                df = get_dataframe(dataset_path)
-                if df.empty:
-                    raise ValueError("Empty DataFrame. Check dataset path or format.")
-                
-                logger.info(f"{'='*10} Processing model: {model_name}")
-                tokenizer, model = get_model_and_tokenizer(
-                    model_config=model_config,
-                    auth_token=credentials.HF_TOKEN,
-                    cache_dir=envs.MODELS_DIR)
-                
-                for question_index, question_col in enumerate(question_columns):
+        for model_name, model_config in models.Config.items():    
+            logger.info(f"{'='*10} Processing model: {model_name}")
+            tokenizer, model = get_model_and_tokenizer(
+                model_config=model_config,
+                auth_token=credentials.HF_TOKEN,
+                cache_dir=envs.MODELS_DIR)
+            
+            for question_index, question_col in enumerate(question_columns):
+                if dataset_path:
+                    df = get_dataframe(dataset_path)
+                    if df.empty:
+                        raise ValueError("Empty DataFrame. Check dataset path or format.")
                     logger.info(f"{'='*5} Processing column {question_index+1}: {question_col}")
                     questions = df[question_col].to_list()
 
@@ -100,10 +101,12 @@ def generate_answers(dataset_path: str = None, question_columns: List[str] = Non
                     logger.info(f"Storing response in dataframe")
                     new_col_name = f"{question_col}_{model_name}"
                     df[new_col_name] = output_texts
+                    
+                    df = df[main_columns + [question_col, new_col_name]]
                     output_path = os.path.join(envs.GENERATED_DATA_DIR, f'{Path(dataset_path).stem}_{model_name}_{question_col}.csv')
                     logger.info(f"Saving results to {output_path}")
                     df.to_csv(output_path, index=False)
-                logger.info("Script completed successfully")
+            logger.info("Script completed successfully")
     except Exception as e:
         logger.error(f"An error occurred in generate_answers: {str(e)}")
         logger.error(traceback.format_exc())
