@@ -89,11 +89,11 @@ def generate_text(model, tokenizer, texts):
 
 
 def generate_answers(
-    dataset_path: str = None, question_columns: List[str] = None, model: str = None
+    dataset_path: str = None, question_columns: List[str] = None, model_name: str = None
 ):
     try:
-        # TODO: Argument: model_name, category, subcategories, max tokens len,
-        model_name, model_config = models.Config[model]
+        # TODO: Argument: category, subcategories, max tokens len,
+        model_config = models.Config[model_name]
         logger.info(f"{'='*10} Processing model: {model_name}")
         tokenizer, model = get_model_and_tokenizer(
             model_config=model_config,
