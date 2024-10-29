@@ -1,13 +1,3 @@
-/*
- * -----------------------------------------------------------------------
- * File: experiments/14_gnrt_ans_for_wrd_lvl_llama31_part1 copy.sh
- * Creation Time: Oct 28th 2024, 3:20 pm
- * Author: Saurabh Zinjad
- * Developer Email: saurabhzinjad@gmail.com
- * Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
- * -----------------------------------------------------------------------
- */
-
 #!/bin/bash
 
 #SBATCH -N 1

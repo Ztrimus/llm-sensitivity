@@ -8,12 +8,12 @@
 			"program": "${workspaceFolder}/src/scripts/generation.py",
 			"console": "integratedTerminal",
 			"args": [
-				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
-				"--question_columns",
-				"Question, Category, Same",
 				"--model",
-				"llama3"
+				"mistral",
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/perturbed/catHarmQA/catqa_char.csv",
+				"--question_columns",
+				"Question_char_random_swap_n4,Question_char_random_delete_n4,Question_char_ocr_n5,Question_char_keyboard_n5,Question_char_random_insert_n5,Question_char_random_substitute_n5,Question_char_random_swap_n5,Question_char_random_delete_n5"
 			],
 			"justMyCode": true
 		},
