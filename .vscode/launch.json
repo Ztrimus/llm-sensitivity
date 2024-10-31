@@ -74,6 +74,20 @@
 				"Question"
 			],
 			"justMyCode": true
+		},
+		{
+			"name": "safety.py",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/safety.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/Users/saurabh/AA/convergent/projects/llm-sensitivity/data/generated/catHarmQA/catqa_mistral_Question.csv",
+				"--question_columns",
+				"Question_mistral"
+			],
+			"justMyCode": true
 		}
 	]
 }
