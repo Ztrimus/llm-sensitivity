@@ -31,8 +31,6 @@ logger = logging.getLogger(__name__)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 logger.info(f"Device: {device}")
 
-main_columns = ["Category", "Subcategory", "Question"]
-
 
 @measure_execution_time
 def moderate(model, tokenizer, texts):
@@ -59,7 +57,7 @@ def moderate(model, tokenizer, texts):
         return None
 
 
-def check_safety(dataset_path: str = None, question_columns: List[str] = None):
+def check_safety(data_dir_path: str = None):
     try:
         model_id = "meta-llama/Llama-Guard-3-8B"
 
@@ -75,14 +73,14 @@ def check_safety(dataset_path: str = None, question_columns: List[str] = None):
             cache_dir=envs.MODELS_DIR,
         ).to(device)
 
-        for question_index, question_col in enumerate(question_columns):
+        for dataset in os.listdir(data_dir_path):
+            dataset_path = os.path.join(data_dir_path, dataset)
             if dataset_path:
                 df = get_dataframe(dataset_path)
                 if df.empty:
                     raise ValueError("Empty DataFrame. Check dataset path or format.")
-                logger.info(
-                    f"{'='*5} Processing column {question_index+1}: {question_col}"
-                )
+                question_col = df.columns[-1]
+                logger.info(f"{'='*5} Processing column {question_col}")
                 questions = df[question_col].to_list()
 
                 output_texts = moderate(model, tokenizer, questions)
@@ -91,7 +89,7 @@ def check_safety(dataset_path: str = None, question_columns: List[str] = None):
                 df[new_col_name] = output_texts
 
                 output_path = os.path.join(
-                    envs.GENERATED_DATA_DIR,
+                    envs.SAFETY_DATA_DIR,
                     f"{Path(dataset_path).stem}_safety.csv",
                 )
                 logger.info(f"Saving results to {output_path}")
@@ -109,13 +107,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dataset_path", type=str, default=None, help="Path to the dataset file."
     )
-    parser.add_argument(
-        "--question_columns",
-        type=split_string_into_list,
-        default=None,
-        help="Columns containing questions to generate answers for.",
-    )
 
     args = parser.parse_args()
 
-    check_safety(args.dataset_path, args.question_columns)
+    check_safety(args.dataset_path)
