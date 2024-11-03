@@ -82,10 +82,14 @@ def get_augmenter(
         elif level == "sentence":
             if perb_type == "contextual_insert":
                 aug = nas.ContextualWordEmbsForSentenceAug(model_path="gpt2", device=device)
+            elif perb_type == "paraphrasing":
+                aug = nas.ContextualWordEmbsForSentenceAug(model_path='t5-base', device=device)
         ## ======= Word/Token
         elif level == "word":
+            if perb_type == "back_translation":
+                aug = naw.BackTranslationAug(from_model_name='facebook/wmt19-en-de', to_model_name='facebook/wmt19-de-en')
             ## Spelling Augmenter
-            if perb_type == "spelling":
+            elif perb_type == "spelling":
                 aug = naw.SpellingAug(aug_max=aug_word_max)
             ## Word Embeddings Augmenter
             # TODO: model_type: word2vec, glove or fasttext, discuss with mentor about the model
