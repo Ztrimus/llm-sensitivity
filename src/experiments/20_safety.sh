@@ -15,4 +15,4 @@ source deactivate
 source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
-python3 src/scripts/safety.py --model llama2 --dataset_path /scratch/szinjad/llm-sensitivity/data/generated/catHarmQA
+python3 src/scripts/safety.py --dataset_path /scratch/szinjad/llm-sensitivity/data/generated/catHarmQA
