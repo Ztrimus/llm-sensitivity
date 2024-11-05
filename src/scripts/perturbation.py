@@ -18,6 +18,7 @@ import nlpaug.augmenter.word as naw
 import nlpaug.augmenter.sentence as nas
 import logging
 import gensim.downloader as gensim_api
+from transformers import MarianMTModel, MarianTokenizer
 import torch
 import nltk
 
@@ -44,6 +45,24 @@ def count_differences(str1, str2, perturb_level):
     elif perturb_level == "word":
         return sum(word1 != word2 for word1, word2 in zip(str1.split(), str2.split()))
 
+def back_translate(sentence):
+    # Initialize models
+    translation_model_en_de = MarianMTModel.from_pretrained('Helsinki-NLP/opus-mt-en-de')
+    translation_tokenizer_en_de = MarianTokenizer.from_pretrained('Helsinki-NLP/opus-mt-en-de')
+    translation_model_de_en = MarianMTModel.from_pretrained('Helsinki-NLP/opus-mt-de-en')
+    translation_tokenizer_de_en = MarianTokenizer.from_pretrained('Helsinki-NLP/opus-mt-de-en')
+    
+    # Translate to German
+    de_tokens = translation_tokenizer_en_de(sentence, return_tensors="pt", padding=True)
+    de_translation = translation_model_en_de.generate(**de_tokens)
+    de_text = translation_tokenizer_en_de.decode(de_translation[0], skip_special_tokens=True)
+    
+    # Translate back to English
+    en_tokens = translation_tokenizer_de_en(de_text, return_tensors="pt", padding=True)
+    en_translation = translation_model_de_en.generate(**en_tokens)
+    en_text = translation_tokenizer_de_en.decode(en_translation[0], skip_special_tokens=True)
+    
+    return en_text
 
 def get_augmenter(
     level: str = "char",
@@ -79,14 +98,16 @@ def get_augmenter(
             elif perb_type == "random_delete":
                 aug = nac.RandomCharAug(action="delete", aug_word_max=aug_word_max, aug_char_max=aug_char_max)
         ## ======= Sentence
-        elif level == "sentence":
+        elif level == "sntnc":
             if perb_type == "contextual_insert":
                 aug = nas.ContextualWordEmbsForSentenceAug(model_path="gpt2", device=device)
             elif perb_type == "paraphrasing":
                 aug = nas.ContextualWordEmbsForSentenceAug(model_path='t5-base', device=device)
+            elif perb_type == "bck_trnsltn":
+                return back_translate
         ## ======= Word/Token
         elif level == "word":
-            if perb_type == "back_translation":
+            if perb_type == "bck_trnsltn":
                 aug = naw.BackTranslationAug(from_model_name='facebook/wmt19-en-de', to_model_name='facebook/wmt19-de-en')
             ## Spelling Augmenter
             elif perb_type == "spelling":
@@ -167,22 +188,24 @@ def perturb_questions(
 
                         if aug:
                             current_col = []
-                            current_col_name = f"{col}_{perturb_level}_{perturb_type}_n{i}"
+                            if perturb_type == "bck_trnsltn":
+                                current_col_name = f"{col}_{perturb_level}_{perturb_type}"
+                            else:
+                                current_col_name = f"{col}_{perturb_level}_{perturb_type}_n{i}"
+
                             print(f"{'='*15} Column: {current_col_name} {'='*15}")
 
                             for idx, text in enumerate(query_col):
                                 print(f"{idx + 1}/{query_col_len}")
-                                augmented_text = aug.augment(text)[0]
-                                try_flag = 0
-                                while (
-                                    count_differences(
-                                        text, augmented_text, perturb_level
-                                    )
-                                    != i
-                                    and try_flag < 10
-                                ):
+                                if perturb_type == "bck_trnsltn":
+                                    augmented_text = aug(text)
+                                else:
                                     augmented_text = aug.augment(text)[0]
-                                    try_flag += 1
+                                    try_flag = 0
+                                    while (count_differences(text, augmented_text, perturb_level) != i and try_flag < 10):
+                                        augmented_text = aug.augment(text)[0]
+                                        try_flag += 1
+
                                 current_col.append(augmented_text)
 
                             df[current_col_name] = current_col
