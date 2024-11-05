@@ -71,7 +71,9 @@ def back_translate(sentence):
         ).to(device)
         de_translation = translation_model_en_de.generate(**de_tokens)
         de_text = translation_tokenizer_en_de.decode(
-            de_translation[0], skip_special_tokens=True
+            de_translation[0],
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=True,
         )
 
         # Translate back to English
@@ -80,7 +82,9 @@ def back_translate(sentence):
         ).to(device)
         en_translation = translation_model_de_en.generate(**en_tokens)
         en_text = translation_tokenizer_de_en.decode(
-            en_translation[0], skip_special_tokens=True
+            en_translation[0],
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=True,
         )
 
         return en_text
