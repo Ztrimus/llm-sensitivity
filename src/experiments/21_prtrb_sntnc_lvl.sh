@@ -15,4 +15,4 @@ source deactivate
 source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
-python3 src/scripts/perturbation.py --dataset_path /scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv --perturbation_level sntnc --perturbation_type bck_trnsltn, paraphrase --query_columns Question --max_perturb 1
+python3 src/scripts/perturbation.py --dataset_path /scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv --perturbation_level sntnc --perturbation_type bck_trnsltn,paraphrase --query_columns Question --max_perturb 1
