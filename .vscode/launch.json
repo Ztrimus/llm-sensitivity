@@ -69,7 +69,7 @@
 				"--perturbation_level",
 				"sntnc",
 				"--perturbation_type",
-				"bck_trnsltn,paraphrase",
+				"paraphrase,bck_trnsltn",
 				"--query_columns",
 				"Question",
 				"--max_perturb",

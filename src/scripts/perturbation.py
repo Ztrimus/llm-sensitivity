@@ -50,7 +50,6 @@ def count_differences(str1, str2, perturb_level):
 
 def back_translate(sentence):
     try:
-        print("Back translating")
         # Initialize models
         translation_model_en_de = MarianMTModel.from_pretrained(
             "Helsinki-NLP/opus-mt-en-de"
@@ -90,6 +89,7 @@ def back_translate(sentence):
         return en_text
     except Exception as e:
         print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         print(traceback.format_exc())
         return None
 
@@ -110,18 +110,16 @@ def paraphrase_sentence(input_text):
             return_tensors="pt",
         ).to(device)
 
-        print("Generate paraphrases")
         translated = model.generate(
             **batch, max_length=60, num_beams=10, num_return_sequences=1
         )
         tgt_text = tokenizer.batch_decode(
             translated, skip_special_tokens=True, clean_up_tokenization_spaces=True
         )
-        print(f"input_text: {input_text}")
-        print(f"tgt_text: {tgt_text}\n\n\n")
         return tgt_text[0]
     except Exception as e:
         print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         print(traceback.format_exc())
         return None
 
@@ -285,9 +283,6 @@ def perturb_questions(
                         aug = get_augmenter(
                             perturb_level, perturb_type, aug_char_max=i, aug_word_max=i
                         )
-
-                        print(f"type: {perturb_type}, aug: {aug}")
-
                         if aug:
                             current_col = []
                             if perturb_type in ["bck_trnsltn", "paraphrase"]:
@@ -305,8 +300,6 @@ def perturb_questions(
                                 print(f"{idx + 1}/{query_col_len}")
                                 if perturb_type in ["bck_trnsltn", "paraphrase"]:
                                     augmented_text = aug(text)
-                                    print("           Text: ", text)
-                                    print(f"Augmented Text: {augmented_text}")
                                 else:
                                     augmented_text = aug.augment(text)[0]
                                     try_flag = 0
@@ -331,6 +324,7 @@ def perturb_questions(
             df.to_csv(output_path, index=False)
     except Exception as e:
         print(f"Error: {e}")
+        logger.error(f"Error: {e}")
 
 
 if __name__ == "__main__":
