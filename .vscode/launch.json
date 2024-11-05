@@ -67,11 +67,13 @@
 				"--dataset_path",
 				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--perturbation_level",
-				"sentence",
+				"sntnc",
 				"--perturbation_type",
-				"contextual_insert",
+				"paraphrase,bck_trnsltn",
 				"--query_columns",
-				"Question"
+				"Question",
+				"--max_perturb",
+				"1"
 			],
 			"justMyCode": true
 		},
@@ -81,12 +83,7 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/src/scripts/safety.py",
 			"console": "integratedTerminal",
-			"args": [
-				"--dataset_path",
-				"/Users/saurabh/AA/convergent/projects/llm-sensitivity/data/generated/catHarmQA/catqa_mistral_Question.csv",
-				"--question_columns",
-				"Question_mistral"
-			],
+			"args": ["--dataset_path", "/scratch/szinjad/llm-sensitivity/data/generated/catHarmQA"],
 			"justMyCode": true
 		}
 	]
