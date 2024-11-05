@@ -331,7 +331,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--perturbation_level",
         type=str,
-        choices=["char", "word", "sentence"],
+        choices=["char", "word", "sntnc"],
         default="char",
         help="Level of perturbation to apply.",
     )
