@@ -19,6 +19,7 @@ import nlpaug.augmenter.sentence as nas
 import logging
 import gensim.downloader as gensim_api
 from transformers import MarianMTModel, MarianTokenizer
+from transformers import PegasusForConditionalGeneration, PegasusTokenizer
 import torch
 import nltk
 
@@ -64,6 +65,38 @@ def back_translate(sentence):
     
     return en_text
 
+def paraphrase_sentence(input_text):
+    try:
+        # Initialize the model and tokenizer
+        model_name = "tuner007/pegasus_paraphrase"
+        
+        tokenizer = PegasusTokenizer.from_pretrained(model_name)
+        model = PegasusForConditionalGeneration.from_pretrained(model_name).to(device)
+
+        batch = tokenizer(
+            [input_text],
+            truncation=True,
+            padding="longest",
+            max_length=60,
+            return_tensors="pt",
+        ).to(device)
+
+        print("Generate paraphrases")
+        translated = model.generate(
+            **batch,
+            max_length=60,
+            num_beams=10,
+            num_return_sequences=1
+        )
+        tgt_text = tokenizer.batch_decode(translated, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+        print(f"input_text: {input_text}")
+        print(f"tgt_text: {tgt_text}\n\n\n")
+        return tgt_text[0]
+    except Exception as e:
+        print(f"Error: {e}")
+        print(traceback.format_exc())
+        return None
+
 def get_augmenter(
     level: str = "char",
     perb_type: str = "ocr",
@@ -101,10 +134,10 @@ def get_augmenter(
         elif level == "sntnc":
             if perb_type == "contextual_insert":
                 aug = nas.ContextualWordEmbsForSentenceAug(model_path="gpt2", device=device)
-            elif perb_type == "paraphrasing":
-                aug = nas.ContextualWordEmbsForSentenceAug(model_path='t5-base', device=device)
+            elif perb_type == "paraphrase":
+                aug = paraphrase_sentence
             elif perb_type == "bck_trnsltn":
-                return back_translate
+                aug = back_translate
         ## ======= Word/Token
         elif level == "word":
             if perb_type == "bck_trnsltn":
