@@ -1,3 +1,4 @@
+import traceback
 import nltk
 from nltk.tokenize import sent_tokenize
 from transformers import (
@@ -51,34 +52,41 @@ def paraphrase_sentence_(sentence, num_paraphrases=5):
 
 
 def paraphrase_sentence(input_text):
-    # Initialize the model and tokenizer
-    print("Initialize the model and tokenizer")
-    model_name = "tuner007/pegasus_paraphrase"
-    torch_device = "cuda" if torch.cuda.is_available() else "cpu"
-    tokenizer = PegasusTokenizer.from_pretrained(model_name)
-    model = PegasusForConditionalGeneration.from_pretrained(model_name).to(torch_device)
+    try:
+        # Initialize the model and tokenizer
+        print("Initialize the model and tokenizer")
+        model_name = "tuner007/pegasus_paraphrase"
+        torch_device = "cuda" if torch.cuda.is_available() else "cpu"
+        tokenizer = PegasusTokenizer.from_pretrained(model_name)
+        model = PegasusForConditionalGeneration.from_pretrained(model_name).to(
+            torch_device
+        )
 
-    print("Batch Tokenize the input text")
-    batch = tokenizer(
-        [input_text],
-        truncation=True,
-        padding="longest",
-        max_length=60,
-        return_tensors="pt",
-    ).to(torch_device)
+        print("Batch Tokenize the input text")
+        batch = tokenizer(
+            [input_text],
+            truncation=True,
+            padding="longest",
+            max_length=60,
+            return_tensors="pt",
+        ).to(torch_device)
 
-    print("Generate paraphrases")
-    translated = model.generate(
-        **batch,
-        max_length=60,
-        num_beams=10,
-        num_return_sequences=1,
-        temperature=1.5,
-    )
-    tgt_text = tokenizer.batch_decode(translated, skip_special_tokens=True)
-    print(f"input_text: {input_text}")
-    print(f"tgt_text: {tgt_text}\n\n\n")
-    return tgt_text
+        print("Generate paraphrases")
+        translated = model.generate(
+            **batch,
+            max_length=60,
+            num_beams=10,
+            num_return_sequences=1,
+            temperature=1.5,
+        )
+        tgt_text = tokenizer.batch_decode(translated, skip_special_tokens=True)
+        print(f"input_text: {input_text}")
+        print(f"tgt_text: {tgt_text}\n\n\n")
+        return tgt_text
+    except Exception as e:
+        print(f"Error: {e}")
+        print(traceback.format_exc())
+        return None
 
 
 def paraphrase_sentence_2(sentence, num_paraphrases=5):
