@@ -52,26 +52,30 @@ def back_translate(sentence):
     # Initialize models
     translation_model_en_de = MarianMTModel.from_pretrained(
         "Helsinki-NLP/opus-mt-en-de"
-    )
+    ).to(device)
     translation_tokenizer_en_de = MarianTokenizer.from_pretrained(
         "Helsinki-NLP/opus-mt-en-de"
     )
     translation_model_de_en = MarianMTModel.from_pretrained(
         "Helsinki-NLP/opus-mt-de-en"
-    )
+    ).to(device)
     translation_tokenizer_de_en = MarianTokenizer.from_pretrained(
         "Helsinki-NLP/opus-mt-de-en"
     )
 
     # Translate to German
-    de_tokens = translation_tokenizer_en_de(sentence, return_tensors="pt", padding=True)
+    de_tokens = translation_tokenizer_en_de(
+        sentence, return_tensors="pt", padding=True
+    ).to(device)
     de_translation = translation_model_en_de.generate(**de_tokens)
     de_text = translation_tokenizer_en_de.decode(
         de_translation[0], skip_special_tokens=True
     )
 
     # Translate back to English
-    en_tokens = translation_tokenizer_de_en(de_text, return_tensors="pt", padding=True)
+    en_tokens = translation_tokenizer_de_en(
+        de_text, return_tensors="pt", padding=True
+    ).to(device)
     en_translation = translation_model_de_en.generate(**en_tokens)
     en_text = translation_tokenizer_de_en.decode(
         en_translation[0], skip_special_tokens=True
