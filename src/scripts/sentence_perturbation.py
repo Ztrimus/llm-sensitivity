@@ -77,7 +77,7 @@ def paraphrase_sentence(input_text):
             max_length=60,
             num_beams=10,
             num_return_sequences=1,
-            temperature=1.5,
+            temperature=0.7,
         )
         tgt_text = tokenizer.batch_decode(translated, skip_special_tokens=True)
         print(f"input_text: {input_text}")
