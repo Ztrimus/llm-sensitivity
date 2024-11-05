@@ -1,3 +1,13 @@
+"""
+-----------------------------------------------------------------------
+File: scripts/sentence_perturbation.py
+Creation Time: Nov 4th 2024, 8:39 pm
+Author: Saurabh Zinjad
+Developer Email: saurabhzinjad@gmail.com
+Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
+-----------------------------------------------------------------------
+"""
+
 import traceback
 import nltk
 from nltk.tokenize import sent_tokenize
@@ -15,40 +25,6 @@ import torch
 # Download necessary NLTK data
 nltk.download("punkt")
 nltk.download("punkt_tab")
-
-
-def paraphrase_sentence_(sentence, num_paraphrases=5):
-    # TODO: Add GPU and cuda
-    # Initialize models
-    paraphrase_model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
-
-    # Encode the sentence
-    sentence_embedding = paraphrase_model.encode(sentence, convert_to_tensor=True)
-
-    # Create a larger set of sentences to search from
-    # You can replace this with a larger corpus of sentences if available
-    sentences = [sentence] * 100
-    sentence_embeddings = paraphrase_model.encode(sentences, convert_to_tensor=True)
-
-    # Perform semantic search
-    hits = semantic_search(
-        sentence_embedding, sentence_embeddings, top_k=num_paraphrases + 1
-    )
-
-    # Generate paraphrases
-    paraphrases = []
-    for hit in hits[0][1:]:  # Skip the first hit as it's the original sentence
-        paraphrase = sentences[hit["corpus_id"]]
-        if paraphrase != sentence:  # Ensure we're not including the original sentence
-            paraphrases.append(paraphrase)
-
-    # If we couldn't generate enough paraphrases, add some variations
-    while len(paraphrases) < num_paraphrases:
-        variation = sentence.replace(".", "!").replace("the", "a")
-        if variation not in paraphrases:
-            paraphrases.append(variation)
-
-    return paraphrases
 
 
 def paraphrase_sentence(input_text):
@@ -73,12 +49,11 @@ def paraphrase_sentence(input_text):
 
         print("Generate paraphrases")
         translated = model.generate(
-            **batch,
-            max_length=60,
-            num_beams=10,
-            num_return_sequences=1
+            **batch, max_length=60, num_beams=10, num_return_sequences=1
         )
-        tgt_text = tokenizer.batch_decode(translated, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+        tgt_text = tokenizer.batch_decode(
+            translated, skip_special_tokens=True, clean_up_tokenization_spaces=True
+        )
         print(f"input_text: {input_text}")
         print(f"tgt_text: {tgt_text}\n\n\n")
         return tgt_text
@@ -86,6 +61,7 @@ def paraphrase_sentence(input_text):
         print(f"Error: {e}")
         print(traceback.format_exc())
         return None
+
 
 def paraphrase_sentence_2(sentence, num_paraphrases=5):
     # Initialize the model and tokenizer

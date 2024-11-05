@@ -67,11 +67,13 @@
 				"--dataset_path",
 				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--perturbation_level",
-				"sentence",
+				"sntnc",
 				"--perturbation_type",
-				"contextual_insert",
+				"bck_trnsltn,paraphrase",
 				"--query_columns",
-				"Question"
+				"Question",
+				"--max_perturb",
+				"1"
 			],
 			"justMyCode": true
 		},
