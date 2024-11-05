@@ -52,11 +52,13 @@ def paraphrase_sentence_(sentence, num_paraphrases=5):
 
 def paraphrase_sentence(input_text):
     # Initialize the model and tokenizer
+    print("Initialize the model and tokenizer")
     model_name = "tuner007/pegasus_paraphrase"
     torch_device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer = PegasusTokenizer.from_pretrained(model_name)
     model = PegasusForConditionalGeneration.from_pretrained(model_name).to(torch_device)
 
+    print("Batch Tokenize the input text")
     batch = tokenizer(
         [input_text],
         truncation=True,
@@ -65,6 +67,7 @@ def paraphrase_sentence(input_text):
         return_tensors="pt",
     ).to(torch_device)
 
+    print("Generate paraphrases")
     translated = model.generate(
         **batch,
         max_length=60,
@@ -125,6 +128,7 @@ def paraphrase_sentence_2(sentence, num_paraphrases=5):
 
 
 def perturb_text(text):
+    print("# sentence tokenization")
     sentences = sent_tokenize(text)
     perturbed_sentences = []
 
