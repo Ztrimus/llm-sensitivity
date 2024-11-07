@@ -1,0 +1,32 @@
+
+=====================================================================
+This module is intended solely for building or source activating user
+python environments, i.e.,
+
+    mamba create -n myenv -c conda-forge
+
+or
+
+    source activate myenv
+
+To list available environments, run:
+
+    mamba info --envs
+
+See our docs: https://links.asu.edu/solpy
+
+Any other use is NOT TESTED.
+=====================================================================
+
+  
+2024-11-05 18:40:23,173 - INFO - Device: cuda
+2024-11-05 18:40:23,178 - INFO - ========== Processing model: llama2
+2024-11-05 18:40:23,178 - INFO - Loading tokenizer for meta-llama/Llama-2-7b-chat-hf
+2024-11-05 18:40:23,873 - INFO - Loading model for meta-llama/Llama-2-7b-chat-hf
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:30<00:30, 30.87s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:43<00:00, 20.21s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:43<00:00, 21.81s/it]
+2024-11-05 18:41:13,927 - ERROR - An error occurred in generate_answers: Empty DataFrame. Check dataset path or format.
+2024-11-05 18:41:13,928 - ERROR - Traceback (most recent call last):
+  File "/scratch/szinjad/llm-sensitivity/src/scripts/generation.py", line 108, in generate_answers
+    raise ValueError("Empty DataFrame. Check dataset path or format.")
+ValueError: Empty DataFrame. Check dataset path or format.
+
