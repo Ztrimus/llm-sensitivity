@@ -83,7 +83,12 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/src/scripts/safety.py",
 			"console": "integratedTerminal",
-			"args": ["--dataset_path", "/scratch/szinjad/llm-sensitivity/data/generated/catHarmQA"],
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/generated/catHarmQA",
+				"--filters",
+				"wrd,llama2"
+			],
 			"justMyCode": true
 		}
 	]
