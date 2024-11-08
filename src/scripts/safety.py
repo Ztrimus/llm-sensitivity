@@ -58,13 +58,7 @@ def moderate(model, tokenizer, texts):
 
 
 def check_safety(data_dir_path: str = None, filters: List[str] = None):
-    try:
-        if filters is None:
-            datasets = os.listdir(data_dir_path)
-        else:
-            datasets = [dataset for dataset in os.listdir(data_dir_path) if all(filter in dataset for filter in filters)]
-
-        model_id = "meta-llama/Llama-Guard-3-8B"
+    try:model_id = "meta-llama/Llama-Guard-3-8B"
 
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=model_id,
@@ -78,10 +72,12 @@ def check_safety(data_dir_path: str = None, filters: List[str] = None):
             cache_dir=envs.MODELS_DIR,
         ).to(device)
 
+        if filters is None:
+            datasets = os.listdir(data_dir_path)
+        else:
+            datasets = [dataset for dataset in os.listdir(data_dir_path) if all(filter in dataset for filter in filters)]
+
         for dataset in datasets:
-            if filters is not None:
-                if not all(f in dataset for f in filters):
-                    continue
             dataset_path = os.path.join(data_dir_path, dataset)
             if dataset_path:
                 df = get_dataframe(dataset_path)

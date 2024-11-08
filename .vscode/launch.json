@@ -87,7 +87,7 @@
 				"--dataset_path",
 				"/scratch/szinjad/llm-sensitivity/data/generated/catHarmQA",
 				"--filters",
-				"wrd,llama2"
+				"word,llama3"
 			],
 			"justMyCode": true
 		}
