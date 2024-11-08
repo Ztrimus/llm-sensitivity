@@ -58,7 +58,8 @@ def moderate(model, tokenizer, texts):
 
 
 def check_safety(data_dir_path: str = None, filters: List[str] = None):
-    try:model_id = "meta-llama/Llama-Guard-3-8B"
+    try:
+        model_id = "meta-llama/Llama-Guard-3-8B"
 
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=model_id,
