@@ -145,11 +145,17 @@ def get_augmenter(
         aug = None
         ## ======= Character
         if level == "char":
-            if perb_type == "ocr":
-                aug = nac.OcrAug(aug_word_max=aug_word_max, aug_char_max=aug_char_max)
-            elif perb_type == "keyboard":
+            if perb_type == "keyboard":
                 aug = nac.KeyboardAug(
                     aug_word_max=aug_word_max, aug_char_max=aug_char_max
+                )
+            elif perb_type == "ocr":
+                aug = nac.OcrAug(aug_word_max=aug_word_max, aug_char_max=aug_char_max)
+            elif perb_type == "random_delete":
+                aug = nac.RandomCharAug(
+                    action="delete",
+                    aug_word_max=aug_word_max,
+                    aug_char_max=aug_char_max,
                 )
             elif perb_type == "random_insert":
                 aug = nac.RandomCharAug(
@@ -167,12 +173,6 @@ def get_augmenter(
                 aug = nac.RandomCharAug(
                     action="swap", aug_word_max=aug_word_max, aug_char_max=aug_char_max
                 )
-            elif perb_type == "random_delete":
-                aug = nac.RandomCharAug(
-                    action="delete",
-                    aug_word_max=aug_word_max,
-                    aug_char_max=aug_char_max,
-                )
         ## ======= Sentence
         elif level == "sntnc":
             if perb_type == "contextual_insert":
@@ -185,13 +185,8 @@ def get_augmenter(
                 aug = back_translate
         ## ======= Word/Token
         elif level == "word":
-            if perb_type == "bck_trnsltn":
-                aug = naw.BackTranslationAug(
-                    from_model_name="facebook/wmt19-en-de",
-                    to_model_name="facebook/wmt19-de-en",
-                )
             ## Spelling Augmenter
-            elif perb_type == "spelling":
+            if perb_type == "spelling":
                 aug = naw.SpellingAug(aug_max=aug_word_max)
             ## Word Embeddings Augmenter
             # TODO: model_type: word2vec, glove or fasttext, discuss with mentor about the model
@@ -213,18 +208,6 @@ def get_augmenter(
                     action="substitute",
                     aug_max=aug_word_max,
                 )
-            ## TF-IDF Augmenter
-            elif perb_type == "random_insert_tfidf":
-                aug = naw.TfIdfAug(
-                    model_path=envs.MODELS_DIR, action="insert", aug_max=aug_word_max
-                )
-            elif perb_type == "random_substitute_tfidf":
-                aug = naw.TfIdfAug(
-                    model_path=envs.MODELS_DIR,
-                    action="substitute",
-                    aug_max=aug_word_max,
-                )
-
             ## Contextual Word Embeddings Augmenter
             # TODO: model_type: bert-base-uncased, distilbert-base-uncased, roberta-base, XLNet
             elif perb_type == "random_insert_cwe":
@@ -248,6 +231,22 @@ def get_augmenter(
                 aug = naw.SynonymAug(
                     aug_src="ppdb",
                     model_path=os.path.join(envs.MODELS_DIR, "ppdb-2.0-s-all"),
+                    aug_max=aug_word_max,
+                )
+            elif perb_type == "bck_trnsltn":
+                aug = naw.BackTranslationAug(
+                    from_model_name="facebook/wmt19-en-de",
+                    to_model_name="facebook/wmt19-de-en",
+                )
+            ## TF-IDF Augmenter
+            elif perb_type == "random_insert_tfidf":
+                aug = naw.TfIdfAug(
+                    model_path=envs.MODELS_DIR, action="insert", aug_max=aug_word_max
+                )
+            elif perb_type == "random_substitute_tfidf":
+                aug = naw.TfIdfAug(
+                    model_path=envs.MODELS_DIR,
+                    action="substitute",
                     aug_max=aug_word_max,
                 )
 

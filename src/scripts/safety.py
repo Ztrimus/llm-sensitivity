@@ -57,7 +57,7 @@ def moderate(model, tokenizer, texts):
         return None
 
 
-def check_safety(data_dir_path: str = None):
+def check_safety(data_dir_path: str = None, filters: List[str] = None):
     try:
         model_id = "meta-llama/Llama-Guard-3-8B"
 
@@ -73,7 +73,12 @@ def check_safety(data_dir_path: str = None):
             cache_dir=envs.MODELS_DIR,
         ).to(device)
 
-        for dataset in os.listdir(data_dir_path):
+        if filters is None:
+            datasets = os.listdir(data_dir_path)
+        else:
+            datasets = [dataset for dataset in os.listdir(data_dir_path) if all(filter in dataset for filter in filters)]
+
+        for dataset in datasets:
             dataset_path = os.path.join(data_dir_path, dataset)
             if dataset_path:
                 df = get_dataframe(dataset_path)
@@ -107,7 +112,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dataset_path", type=str, default=None, help="Path to the dataset file."
     )
+    parser.add_argument(
+        "--filters",
+        type=split_string_into_list,
+        default=None,
+        help="Filter datasets based on the given list of filters.",
+    )
+
 
     args = parser.parse_args()
 
-    check_safety(args.dataset_path)
+    check_safety(args.dataset_path, args.filters)
