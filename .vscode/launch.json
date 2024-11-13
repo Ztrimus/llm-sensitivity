@@ -90,6 +90,20 @@
 				"word,llama3"
 			],
 			"justMyCode": true
+		},
+		{
+			"name": "safety-questions",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/safety.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/scratch/szinjad/llm-sensitivity/data/perturbed/catHarmQA",
+				"--is_perturbed_question",
+				"True"
+			],
+			"justMyCode": true
 		}
 	]
 }
