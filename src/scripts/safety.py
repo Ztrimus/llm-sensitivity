@@ -97,9 +97,7 @@ def check_safety(
                     question_col_list = [df.columns[-1]]
                     output_dir_path = envs.SAFETY_DATA_DIR
                 else:
-                    question_col_list = [
-                        column.startswith("Question") for column in df.columns
-                    ]
+                    question_col_list = [column for column in df.columns if column.startswith("Question")]
                     output_dir_path = envs.SAFETY_QUESTIONS_DATA_DIR
 
                 for question_col in question_col_list:

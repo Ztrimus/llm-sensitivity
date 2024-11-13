@@ -13,6 +13,6 @@ SAFETY_DATA_DIR = (
     f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/safety/catHarmQA/response"
 )
 SAFETY_QUESTIONS_DATA_DIR = (
-    f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/safety/catHarmQA/response"
+    f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/safety/catHarmQA/questions"
 )
 MAX_RESPONSE_LEN = 256
