@@ -11,7 +11,7 @@
 				"--model",
 				"mistral",
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/perturbed/catHarmQA/catqa_char.csv",
+				"/home/szinjad/llm-sensitivity/data/perturbed/catHarmQA/catqa_char.csv",
 				"--question_columns",
 				"Question_char_random_swap_n4,Question_char_random_delete_n4,Question_char_ocr_n5,Question_char_keyboard_n5,Question_char_random_insert_n5,Question_char_random_substitute_n5,Question_char_random_swap_n5,Question_char_random_delete_n5"
 			],
@@ -25,7 +25,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
+				"/home/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--perturbation_level",
 				"char",
 				"--perturbation_type",
@@ -45,7 +45,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
+				"/home/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--perturbation_level",
 				"word",
 				"--perturbation_type",
@@ -65,7 +65,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
+				"/home/szinjad/llm-sensitivity/data/original/catHarmQA/catqa.csv",
 				"--perturbation_level",
 				"sntnc",
 				"--perturbation_type",
@@ -85,7 +85,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/generated/catHarmQA",
+				"/home/szinjad/llm-sensitivity/data/generated/catHarmQA",
 				"--filters",
 				"word,llama3"
 			],
@@ -99,7 +99,7 @@
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/scratch/szinjad/llm-sensitivity/data/perturbed/catHarmQA",
+				"/home/szinjad/llm-sensitivity/data/perturbed/catHarmQA",
 				"--is_perturbed_question",
 				"True"
 			],
