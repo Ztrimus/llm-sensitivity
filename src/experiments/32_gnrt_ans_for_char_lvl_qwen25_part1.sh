@@ -1,13 +1,3 @@
-/*
- * -----------------------------------------------------------------------
- * File: experiments/8_gnrt_ans_for_char_lvl_llama31_part1 copy.sh
- * Creation Time: Nov 23rd 2024, 3:05 pm
- * Author: Saurabh Zinjad
- * Developer Email: saurabhzinjad@gmail.com
- * Copyright (c) 2023-2024 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
- * -----------------------------------------------------------------------
- */
-
 #!/bin/bash
 
 #SBATCH -N 1
