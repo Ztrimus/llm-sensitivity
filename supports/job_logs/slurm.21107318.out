@@ -1,0 +1,3 @@
+cache_dir:  /scratch/szinjad/cache/llm-sensitivity/models
+Function generate_text took 5320.8601 seconds to execute
+Function generate_text took 5344.6855 seconds to execute
