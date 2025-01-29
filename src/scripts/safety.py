@@ -57,7 +57,11 @@ def moderate(model, tokenizer, texts):
         return None
 
 
-def check_safety(data_dir_path: str = None, filters: List[str] = None):
+def check_safety(
+    data_dir_path: str = None,
+    filters: List[str] = None,
+    is_perturbed_questions: bool = False,
+):
     try:
         model_id = "meta-llama/Llama-Guard-3-8B"
 
@@ -76,7 +80,11 @@ def check_safety(data_dir_path: str = None, filters: List[str] = None):
         if filters is None:
             datasets = os.listdir(data_dir_path)
         else:
-            datasets = [dataset for dataset in os.listdir(data_dir_path) if all(filter in dataset for filter in filters)]
+            datasets = [
+                dataset
+                for dataset in os.listdir(data_dir_path)
+                if all(filter in dataset for filter in filters)
+            ]
 
         for dataset in datasets:
             dataset_path = os.path.join(data_dir_path, dataset)
@@ -84,21 +92,33 @@ def check_safety(data_dir_path: str = None, filters: List[str] = None):
                 df = get_dataframe(dataset_path)
                 if df.empty:
                     raise ValueError("Empty DataFrame. Check dataset path or format.")
-                question_col = df.columns[-1]
-                logger.info(f"{'='*5} Processing column {question_col}")
-                questions = df[question_col].to_list()
 
-                output_texts = moderate(model, tokenizer, questions)
-                logger.info(f"Storing response in dataframe")
-                new_col_name = f"{question_col}_safety"
-                df[new_col_name] = output_texts
+                if not is_perturbed_questions:
+                    question_col_list = [df.columns[-1]]
+                    output_dir_path = envs.SAFETY_DATA_DIR
+                else:
+                    question_col_list = [column for column in df.columns if column.startswith("Question")]
+                    output_dir_path = envs.SAFETY_QUESTIONS_DATA_DIR
 
-                output_path = os.path.join(
-                    envs.SAFETY_DATA_DIR,
-                    f"{Path(dataset_path).stem}_safety.csv",
-                )
-                logger.info(f"Saving results to {output_path}")
-                df.to_csv(output_path, index=False)
+                for question_col in question_col_list:
+                    logger.info(f"{'='*5} Processing column {question_col}")
+                    questions = df[question_col].to_list()
+
+                    output_texts = moderate(model, tokenizer, questions)
+                    logger.info(f"Storing response in dataframe")
+                    new_col_name = f"{question_col}_safety"
+                    df.insert(
+                        df.columns.get_loc(question_col) + 1,
+                        new_col_name,
+                        output_texts,
+                    )
+
+                    output_path = os.path.join(
+                        output_dir_path,
+                        f"{Path(dataset_path).stem}_safety.csv",
+                    )
+                    logger.info(f"Saving results to {output_path}")
+                    df.to_csv(output_path, index=False)
         logger.info("Script completed successfully")
     except Exception as e:
         logger.error(f"An error occurred in generate_answers: {str(e)}")
@@ -118,8 +138,13 @@ if __name__ == "__main__":
         default=None,
         help="Filter datasets based on the given list of filters.",
     )
-
+    parser.add_argument(
+        "--is_perturbed_questions",
+        type=bool,
+        default=False,
+        help="Is the datasets perturbed questions?",
+    )
 
     args = parser.parse_args()
 
-    check_safety(args.dataset_path, args.filters)
+    check_safety(args.dataset_path, args.filters, args.is_perturbed_questions)
