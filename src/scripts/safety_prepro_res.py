@@ -10,12 +10,9 @@ Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com
 
 import os
 
-import argparse
 import traceback
-from typing import List
-from utils import get_dataframe, split_string_into_list, measure_execution_time
-from config import envs, credentials, models
-from pathlib import Path
+from utils import measure_execution_time
+from config import envs, credentials
 
 import torch
 import pandas as pd
@@ -74,8 +71,7 @@ def check_safety():
         ).to(device)
 
         question_col_list = ["original_response_pre", "perturbed_response_pre"]
-        data_dir = "../../data/"
-        dataset_path = os.path.join(data_dir, "analyzed/catHarmQA/combined_catqa.csv")
+        dataset_path = "/scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa.csv"
         data = pd.read_csv(dataset_path)
 
         for question_col in question_col_list:
