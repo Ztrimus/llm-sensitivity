@@ -54,7 +54,7 @@ def moderate(model, tokenizer, texts):
         return None
 
 
-def check_safety():
+def check_safety(dataset_path):
     try:
         model_id = "meta-llama/Llama-Guard-3-8B"
 
@@ -71,7 +71,6 @@ def check_safety():
         ).to(device)
 
         question_col_list = ["original_response_pre", "perturbed_response_pre"]
-        dataset_path = "/scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa.csv"
         data = pd.read_csv(dataset_path)
 
         for question_col in question_col_list:
@@ -93,4 +92,13 @@ def check_safety():
 
 
 if __name__ == "__main__":
-    check_safety()
+    parser = argparse.ArgumentParser(
+        description="Run safety check using llama guard script."
+    )
+    parser.add_argument(
+        "--dataset_path", type=str, default=None, help="Path to the dataset file."
+    )
+
+    args = parser.parse_args()
+
+    check_safety(args.dataset_path)
