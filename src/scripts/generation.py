@@ -67,21 +67,24 @@ def get_model_and_tokenizer(model_config, auth_token, cache_dir):
 
 
 @measure_execution_time
-def generate_text(model, tokenizer, texts):
+def generate_text(model, tokenizer, texts, temp=1, top_p=1):
     try:
         tokenizer.pad_token = tokenizer.eos_token
         output_texts = []
         for id, text in enumerate(texts):
-            logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
+            if isinstance(text, str):
+                logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
 
-            inputs = tokenizer(text, return_tensors="pt")
-            outputs = model.generate(
-                inputs.input_ids.to(device),
-                max_length=envs.MAX_RESPONSE_LEN,
-                pad_token_id=tokenizer.eos_token_id,
-            )
-            output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
-            output_texts.append(output_text)
+                inputs = tokenizer(text, return_tensors="pt")
+                outputs = model.generate(
+                    inputs.input_ids.to(device),
+                    max_length=envs.MAX_RESPONSE_LEN,
+                    pad_token_id=tokenizer.eos_token_id,
+                    temperature=temp,
+                    top_p=top_p,
+                )
+                output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+                output_texts.append(output_text)
         return output_texts
     except Exception as e:
         logger.error(f"Error generating text: {str(e)}")
@@ -124,6 +127,16 @@ def generate_answers(
                 logger.info(f"Saving results to {output_path}")
                 df.to_csv(output_path, index=False)
         logger.info("Script completed successfully")
+    except Exception as e:
+        logger.error(f"An error occurred in generate_answers: {str(e)}")
+        logger.error(traceback.format_exc())
+
+def generate(tokenizer, model, query: str = None, temp=None, top_p=None):
+    try:
+        if query:
+            return generate_text(model, tokenizer, [query], temp, top_p)[0]
+        else:
+            raise ValueError("Query is empty")
     except Exception as e:
         logger.error(f"An error occurred in generate_answers: {str(e)}")
         logger.error(traceback.format_exc())
