@@ -38,7 +38,7 @@ def moderate(model, tokenizer, texts):
         output_texts = []
         for id, text in enumerate(texts):
             if isinstance(text, str):
-                logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
+                logger.info(f"{'='*15} {id+1}/{len(texts)} text: \n{text}\n\n")
 
                 chat = [{"role": "user", "content": text}]
                 input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
@@ -54,14 +54,18 @@ def moderate(model, tokenizer, texts):
                 try:
                     output_text = filter_safety_response(output_text)
                 except Exception as e:
-                    logger.error(f"output_text: {output_text}")
+                    logger.error(f"Error output_text: {output_text}")
                     logger.error(f"Error filtering response: {str(e)}")
+                    print(f"Error: {e}")
+                
                 output_texts.append(output_text)
             else:
                 output_texts.append('safe')
+        print(f"Uniue Output texts:\n {pd.Series(output_texts).value_counts()}")
         return output_texts
     except Exception as e:
         logger.error(f"Error generating text: {str(e)}")
+        print(f"Error: {e}")
         return None
 
 
@@ -84,28 +88,34 @@ def check_safety(dataset_path):
         data = pd.read_csv(dataset_path)
 
         for question_col in question_col_list:
+            print(f"Processing column: {question_col}")
             questions = data[question_col].to_list()
 
             # Test for null values
             try:
                 empty_texts = data[data[question_col].isnull() == True][question_col].tolist()[0]
-                print(moderate(model, tokenizer, questions))
+                print(f"Empty texts processing: {moderate(model, tokenizer, questions)}")
             except Exception as e:
                 logger.error(f"Error in null values: {str(e)}")
+                print(f"Error in null values: {str(e)}")
 
             output_texts = moderate(model, tokenizer, questions)
             print(f"Storing response in dataframe")
             new_col_name = f"{question_col}_safety"
-            data.insert(
-                data.columns.get_loc(question_col) + 1,
-                new_col_name,
-                output_texts,
-            )
+            if new_col_name in data.columns:
+                data[new_col_name] = output_texts
+            else:
+                data.insert(
+                    data.columns.get_loc(question_col) + 1,
+                    new_col_name,
+                    output_texts,
+                )
 
             data.to_csv(dataset_path, index=False)
     except Exception as e:
         logger.error(f"An error occurred in generate_answers: {str(e)}")
         logger.error(traceback.format_exc())
+        print(f"Error: {e}")
 
 
 if __name__ == "__main__":
