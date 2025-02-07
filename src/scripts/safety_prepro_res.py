@@ -10,6 +10,7 @@ Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com
 
 import os
 import argparse
+import torch.nn as nn
 
 import traceback
 from utils import measure_execution_time
@@ -84,20 +85,17 @@ def check_safety(dataset_path):
             cache_dir=envs.MODELS_DIR,
         ).to(device)
 
+
+        if torch.cuda.device_count() > 1:
+            logger.info(f"Using {torch.cuda.device_count()} GPUs")
+            model = nn.DataParallel(model)  # Wrap model for multi-GPU usage
+
         question_col_list = ["perturbed_response_pre", "original_response_pre"]
         data = pd.read_csv(dataset_path)
 
         for question_col in question_col_list:
             print(f"Processing column: {question_col}")
             questions = data[question_col].to_list()
-
-            # Test for null values
-            try:
-                empty_texts = data[data[question_col].isnull() == True][question_col].tolist()[0]
-                print(f"Empty texts processing: {moderate(model, tokenizer, questions)}")
-            except Exception as e:
-                logger.error(f"Error in null values: {str(e)}")
-                print(f"Error in null values: {str(e)}")
 
             output_texts = moderate(model, tokenizer, questions)
             print(f"Storing response in dataframe")
@@ -110,8 +108,10 @@ def check_safety(dataset_path):
                     new_col_name,
                     output_texts,
                 )
-
+            print("Storing {question_col} column in {dataset_path}")
             data.to_csv(dataset_path, index=False)
+            logger.info("Stored {question_col} column in {dataset_path}")
+            print(f"{'-'*240}")
     except Exception as e:
         logger.error(f"An error occurred in generate_answers: {str(e)}")
         logger.error(traceback.format_exc())
