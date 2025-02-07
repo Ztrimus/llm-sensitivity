@@ -2,7 +2,7 @@
 
 #SBATCH -N 1
 #SBATCH -p general
-#SBATCH -q grp_huanliu
+#SBATCH -q public
 #SBATCH -t 16:00:00
 #SBATCH --gres=gpu:a100:2
 #SBATCH --mem=80G
