@@ -30,8 +30,10 @@ logger = logging.getLogger(__name__)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 logger.info(f"Device: {device}")
 
+
 def filter_safety_response(label):
     return label.strip().split()[0].lower()
+
 
 @measure_execution_time
 def moderate(model, tokenizer, texts):
@@ -45,9 +47,16 @@ def moderate(model, tokenizer, texts):
                 input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
                     device
                 )
-                output = model.generate(
-                    input_ids=input_ids, max_new_tokens=100, pad_token_id=0
-                )
+
+                if hasattr(model, "module"):
+                    output = model.module.generate(
+                        input_ids=input_ids, max_new_tokens=100, pad_token_id=0
+                    )
+                else:
+                    output = model.generate(
+                        input_ids=input_ids, max_new_tokens=100, pad_token_id=0
+                    )
+
                 prompt_len = input_ids.shape[-1]
                 output_text = tokenizer.decode(
                     output[0][prompt_len:], skip_special_tokens=True
@@ -58,10 +67,10 @@ def moderate(model, tokenizer, texts):
                     logger.error(f"Error output_text: {output_text}")
                     logger.error(f"Error filtering response: {str(e)}")
                     print(f"Error: {e}")
-                
+
                 output_texts.append(output_text)
             else:
-                output_texts.append('safe')
+                output_texts.append("safe")
         print(f"Uniue Output texts:\n {pd.Series(output_texts).value_counts()}")
         return output_texts
     except Exception as e:
@@ -84,7 +93,6 @@ def check_safety(dataset_path):
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
         ).to(device)
-
 
         if torch.cuda.device_count() > 1:
             logger.info(f"Using {torch.cuda.device_count()} GPUs")
