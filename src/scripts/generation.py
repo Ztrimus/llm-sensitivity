@@ -28,8 +28,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-logger.info(f"Device: {device}")
+if torch.cuda.is_available():
+    device = "cuda"
+elif torch.backends.mps.is_available():
+    device = "mps"
+else:
+    device = "cpu"
+
+logger.info("Device: %s", device)
+print(f"Device: {device}")
 
 main_columns = ["Category", "Subcategory", "Question"]
 
@@ -83,7 +90,9 @@ def generate_text(model, tokenizer, texts, temp=1, top_p=1):
                     temperature=temp,
                     top_p=top_p,
                 )
-                output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+                output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[
+                    0
+                ]
                 output_texts.append(output_text)
         return output_texts
     except Exception as e:
@@ -130,6 +139,7 @@ def generate_answers(
     except Exception as e:
         logger.error(f"An error occurred in generate_answers: {str(e)}")
         logger.error(traceback.format_exc())
+
 
 def generate(tokenizer, model, query: str = None, temp=None, top_p=None):
     try:
