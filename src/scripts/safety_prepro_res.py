@@ -140,6 +140,7 @@ def check_safety(dataset_path):
         model.half()  # Convert model parameters and buffers to FP16
 
         if torch.cuda.device_count() > 1:
+            torch.distributed.init_process_group(backend="nccl")
             model = DistributedDataParallel(model)  # Wrap model for multi-GPU usage
             # model = nn.DataParallel(model)  # Wrap model for multi-GPU usage
 
