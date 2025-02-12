@@ -7,10 +7,14 @@ Developer Email: saurabhzinjad@gmail.com
 Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
 -----------------------------------------------------------------------
 """
+# torch.no_grad()
+# model.half()
+# torch.cuda.amp.autocast()
 
 import os
 import argparse
 import torch.nn as nn
+from torch.nn.parallel import DistributedDataParallel
 
 import traceback
 from utils import measure_execution_time
@@ -39,10 +43,9 @@ def filter_safety_response(label):
 def moderate(model, tokenizer, texts):
     try:
         output_texts = []
+        logger.info(f"Started generating text for {len(texts)} texts")
         for id, text in enumerate(texts):
             if isinstance(text, str):
-                logger.info(f"{'='*15} {id+1}/{len(texts)} text: \n{text}\n\n")
-
                 chat = [{"role": "user", "content": text}]
                 input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
                     device
@@ -78,6 +81,46 @@ def moderate(model, tokenizer, texts):
         print(f"Error: {e}")
         return None
 
+@measure_execution_time
+def moderate_batch(model, tokenizer, texts, batch_size=32):
+    output_texts = []
+    logger.info(f"Started generating text for {len(texts)} texts")
+    # Process texts in batches.
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i+batch_size]
+        # Prepare chat messages if needed. Otherwise, simply batch encode the texts.
+        batch_inputs = tokenizer(
+            batch_texts,
+            return_tensors="pt",
+            padding=True,
+            truncation=True
+        ).to(device)
+        
+        with torch.no_grad():
+            # Optionally use AMP for faster mixed precision inference.
+            with torch.cuda.amp.autocast(device_type=device):
+                outputs = model.generate(
+                    input_ids=batch_inputs.input_ids,
+                    attention_mask=batch_inputs.attention_mask,
+                    max_new_tokens=100,
+                    pad_token_id=0
+                )
+        # Iterate through batch outputs and apply filtering.
+        for j, output in enumerate(outputs):
+            # Dynamically determine prompt lengths can be tricky.
+            # If each entry has a different prompt length, consider storing these lengths prior to batching.
+            prompt_length = (batch_inputs.input_ids[j] != tokenizer.pad_token_id).sum()
+            decoded = tokenizer.decode(
+                output[prompt_length:],
+                skip_special_tokens=True
+            )
+            try:
+                decoded = filter_safety_response(decoded)
+            except Exception as e:
+                logger.error(f"Error filtering response: {str(e)}")
+            output_texts.append(decoded)
+    return output_texts
+
 
 def check_safety(dataset_path):
     try:
@@ -95,8 +138,8 @@ def check_safety(dataset_path):
         ).to(device)
 
         if torch.cuda.device_count() > 1:
-            logger.info(f"Using {torch.cuda.device_count()} GPUs")
-            model = nn.DataParallel(model)  # Wrap model for multi-GPU usage
+            model = DistributedDataParallel(model)  # Wrap model for multi-GPU usage
+            # model = nn.DataParallel(model)  # Wrap model for multi-GPU usage
 
         question_col_list = ["perturbed_response_pre", "original_response_pre"]
         data = pd.read_csv(dataset_path)
@@ -105,7 +148,7 @@ def check_safety(dataset_path):
             print(f"Processing column: {question_col}")
             questions = data[question_col].to_list()
 
-            output_texts = moderate(model, tokenizer, questions)
+            output_texts = moderate_batch(model, tokenizer, questions)
             print(f"Storing response in dataframe")
             new_col_name = f"{question_col}_safety"
             if new_col_name in data.columns:
@@ -117,7 +160,7 @@ def check_safety(dataset_path):
                     output_texts,
                 )
             print("Storing {question_col} column in {dataset_path}")
-            data.to_csv(dataset_path, index=False)
+            data.to_csv(dataset_path, index=False, chunksize=10000)
             logger.info("Stored {question_col} column in {dataset_path}")
             print(f"{'-'*240}")
     except Exception as e:
