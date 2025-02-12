@@ -135,7 +135,9 @@ def check_safety(dataset_path):
             pretrained_model_name_or_path=model_id,
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
-        ).to(device)
+        )
+        model.to(device)
+        model.half()  # Convert model parameters and buffers to FP16
 
         if torch.cuda.device_count() > 1:
             model = DistributedDataParallel(model)  # Wrap model for multi-GPU usage
