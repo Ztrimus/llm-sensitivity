@@ -1,12 +1,13 @@
 """
 -----------------------------------------------------------------------
 File: scripts/safety_prepro_res.py
-Creation Time: Jan 29th 2025, 12:25 am
+Creation Time: Feb 13th 2025, 1:09 am
 Author: Saurabh Zinjad
 Developer Email: saurabhzinjad@gmail.com
 Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
 -----------------------------------------------------------------------
 """
+
 # torch.no_grad()
 # model.half()
 # torch.cuda.amp.autocast()
@@ -81,21 +82,19 @@ def moderate(model, tokenizer, texts):
         print(f"Error: {e}")
         return None
 
+
 @measure_execution_time
 def moderate_batch(model, tokenizer, texts, batch_size=32):
     output_texts = []
     logger.info(f"Started generating text for {len(texts)} texts")
     # Process texts in batches.
     for i in range(0, len(texts), batch_size):
-        batch_texts = texts[i:i+batch_size]
+        batch_texts = texts[i : i + batch_size]
         # Prepare chat messages if needed. Otherwise, simply batch encode the texts.
         batch_inputs = tokenizer(
-            batch_texts,
-            return_tensors="pt",
-            padding=True,
-            truncation=True
+            batch_texts, return_tensors="pt", padding=True, truncation=True
         ).to(device)
-        
+
         with torch.no_grad():
             # Optionally use AMP for faster mixed precision inference.
             with torch.cuda.amp.autocast(device_type=device):
@@ -103,17 +102,14 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
                     input_ids=batch_inputs.input_ids,
                     attention_mask=batch_inputs.attention_mask,
                     max_new_tokens=100,
-                    pad_token_id=0
+                    pad_token_id=0,
                 )
         # Iterate through batch outputs and apply filtering.
         for j, output in enumerate(outputs):
             # Dynamically determine prompt lengths can be tricky.
             # If each entry has a different prompt length, consider storing these lengths prior to batching.
             prompt_length = (batch_inputs.input_ids[j] != tokenizer.pad_token_id).sum()
-            decoded = tokenizer.decode(
-                output[prompt_length:],
-                skip_special_tokens=True
-            )
+            decoded = tokenizer.decode(output[prompt_length:], skip_special_tokens=True)
             try:
                 decoded = filter_safety_response(decoded)
             except Exception as e:

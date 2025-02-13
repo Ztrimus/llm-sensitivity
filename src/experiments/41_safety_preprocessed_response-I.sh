@@ -15,4 +15,8 @@ source deactivate
 source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
+export RANK=0
+export WORLD_SIZE=1
+export MASTER_ADDR=127.0.0.1
+export MASTER_PORT=29500
 python3 src/scripts/safety_prepro_res.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa.csv
