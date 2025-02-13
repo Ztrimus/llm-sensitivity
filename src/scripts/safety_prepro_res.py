@@ -97,7 +97,7 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
 
         with torch.no_grad():
             # Optionally use AMP for faster mixed precision inference.
-            with torch.cuda.amp.autocast(device_type=device):
+            with torch.amp.autocast(device_type=device):
                 outputs = model.generate(
                     input_ids=batch_inputs.input_ids,
                     attention_mask=batch_inputs.attention_mask,
