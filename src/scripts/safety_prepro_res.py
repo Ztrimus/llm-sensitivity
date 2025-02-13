@@ -89,7 +89,10 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
     logger.info(f"Started generating text for {len(texts)} texts")
     # Process texts in batches.
     for i in range(0, len(texts), batch_size):
-        batch_texts = texts[i : i + batch_size]
+        batch_texts_raw = texts[i : i + batch_size]
+        batch_texts = [
+            str(text) if not isinstance(text, str) else text for text in batch_texts_raw
+        ]
         # Prepare chat messages if needed. Otherwise, simply batch encode the texts.
         batch_inputs = tokenizer(
             batch_texts, return_tensors="pt", padding=True, truncation=True
