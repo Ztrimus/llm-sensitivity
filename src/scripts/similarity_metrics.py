@@ -32,78 +32,66 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 logger.info(f"Device: {device}")
 
 
-def filter_safety_response(label):
-    return label.strip().split()[0].lower()
+import pandas as pd
+import editdistance
+import traceback
+import logging
+import tensorflow_hub as hub
+import numpy as np
 
+# Load USE model
+embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 
-@measure_execution_time
-def moderate(model, tokenizer, texts):
-    try:
-        output_texts = []
-        for id, text in enumerate(texts):
-            if isinstance(text, str):
-                logger.info(f"{'='*15} {id+1}/{len(texts)} text: \n{text}\n\n")
-
-                chat = [{"role": "user", "content": text}]
-                input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
-                    device
-                )
-
-                if hasattr(model, "module"):
-                    output = model.module.generate(
-                        input_ids=input_ids, max_new_tokens=100, pad_token_id=0
-                    )
-                else:
-                    output = model.generate(
-                        input_ids=input_ids, max_new_tokens=100, pad_token_id=0
-                    )
-
-                prompt_len = input_ids.shape[-1]
-                output_text = tokenizer.decode(
-                    output[0][prompt_len:], skip_special_tokens=True
-                )
-                try:
-                    output_text = filter_safety_response(output_text)
-                except Exception as e:
-                    logger.error(f"Error output_text: {output_text}")
-                    logger.error(f"Error filtering response: {str(e)}")
-                    print(f"Error: {e}")
-
-                output_texts.append(output_text)
-            else:
-                output_texts.append("safe")
-        print(f"Uniue Output texts:\n {pd.Series(output_texts).value_counts()}")
-        return output_texts
-    except Exception as e:
-        logger.error(f"Error generating text: {str(e)}")
-        print(f"Error: {e}")
-        return None
+# Logger setup
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 def get_similarity(dataset_path):
     try:
+        # Load dataset
         data = pd.read_csv(dataset_path)
 
-        similarity_col = []
+        token_similarities = []
+        latent_similarities = []
+
+        # Compute similarities
         for i in range(len(data)):
             og = data.iloc[i]["original_question"]
             cf = data.iloc[i]["perturbed_question"]
 
-            similarity_col.append(editdistance.eval(og, cf) / max(len(og), len(cf)))
+            # Token-level similarity (Levenshtein distance)
+            token_sim = editdistance.eval(og, cf) / max(len(og), len(cf))
+            token_similarities.append(token_sim)
 
-        print(f"Storing response in dataframe")
-        new_col_name = f"token_similarity"
-        if new_col_name in data.columns:
-            data[new_col_name] = similarity_col
-        else:
-            data.insert(len(data.columns), new_col_name, similarity_col)
+        print(f"Token-level similarity computed for {len(data)} rows.")
 
-        print("Storing {question_col} column in {dataset_path}")
+        # Compute USE embeddings for all questions at once (vectorized)
+        embeddings = embed(
+            data[["original_question", "perturbed_question"]].values.tolist()
+        )
+        original_embeds = embeddings[:, 0, :]
+        perturbed_embeds = embeddings[:, 1, :]
+
+        # Cosine similarity in latent space
+        for i in range(len(data)):
+            cosine_sim = np.dot(original_embeds[i], perturbed_embeds[i]) / (
+                np.linalg.norm(original_embeds[i]) * np.linalg.norm(perturbed_embeds[i])
+            )
+            latent_similarities.append(cosine_sim)
+
+        print(f"Latent space similarity computed for {len(data)} rows.")
+
+        # Store results in dataframe
+        data["token_similarity"] = token_similarities
+        data["latent_similarity"] = latent_similarities
+
+        # Save to CSV
         data.to_csv(dataset_path, index=False)
-        logger.info("Stored {question_col} column in {dataset_path}")
-        print(f"{'-'*240}")
+        print(f"Updated dataset saved at {dataset_path}")
+
     except Exception as e:
-        logger.error(f"An error occurred in generate_answers: {str(e)}")
+        logger.error(f"An error occurred: {str(e)}")
         logger.error(traceback.format_exc())
         print(f"Error: {e}")
 
