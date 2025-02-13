@@ -127,6 +127,10 @@ def check_safety(dataset_path):
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
         )
+        # Set pad_token to eos_token if it's not set
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+            # tokenizer.add_special_tokens({"pad_token": "[PAD]"})
         model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path=model_id,
             token=credentials.HF_TOKEN,
