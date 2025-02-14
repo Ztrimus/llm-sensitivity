@@ -39,7 +39,10 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
         ]
 
         # Build chat prompts for each text
-        batch_chats = [{"role": "user", "content": text} for text in batch_texts]
+        batch_chats = [
+            [{"role": "user", "content": text}, {"role": "assistant", "content": ""}]
+            for text in batch_texts
+        ]
         # Apply chat template
         batch_inputs = tokenizer.apply_chat_template(
             batch_chats, return_tensors="pt", padding=True, truncation=True
