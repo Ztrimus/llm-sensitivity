@@ -104,6 +104,18 @@
 				"True"
 			],
 			"justMyCode": true
+		},
+		{
+			"name": "similarity-check",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/scripts/similarity_metrics.py",
+			"console": "integratedTerminal",
+			"args": [
+				"--dataset_path",
+				"/Users/saurabh/AA/convergent/projects/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa_sample.csv"
+			],
+			"justMyCode": true
 		}
 	]
 }
