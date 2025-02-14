@@ -6,7 +6,7 @@
 #SBATCH -q private
 #SBATCH -t 01:00:00
 #SBATCH --gres=gpu:a100:2
-#SBATCH --mem=40G
+#SBATCH --mem=80G
 #SBATCH -o /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.out
 #SBATCH -e /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.err
 #SBATCH --mail-type=ALL
@@ -17,7 +17,7 @@ source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
 export RANK=0
-export WORLD_SIZE=1
+export WORLD_SIZE=2
 export MASTER_ADDR=127.0.0.1
 export MASTER_PORT=29500
 python3 src/scripts/safety_prepro_res.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa_sample.csv

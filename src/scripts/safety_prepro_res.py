@@ -91,6 +91,7 @@ def check_safety(dataset_path):
             pretrained_model_name_or_path=model_id,
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
+            torch_dtype=torch.float16,
         )
         # Switch to eval mode
         model.eval()
