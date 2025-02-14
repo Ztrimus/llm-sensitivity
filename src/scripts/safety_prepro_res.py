@@ -67,6 +67,7 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
             #     decoded = filter_safety_response(decoded)
             # except Exception as e:
             #     print_log(f"Error filtering response: {str(e)}", is_error=True)
+            print_log(f"\n\n{decoded}\n\n")
             output_texts.append(decoded)
     return output_texts
 
