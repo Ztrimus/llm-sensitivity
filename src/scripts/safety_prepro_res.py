@@ -46,6 +46,7 @@ def moderate(model, tokenizer, texts):
         output_texts = []
         logger.info(f"Started generating text for {len(texts)} texts")
         for id, text in enumerate(texts):
+            print(f"Processing: {id}/{len(texts)}")
             if isinstance(text, str):
                 chat = [{"role": "user", "content": text}]
                 input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
