@@ -1,23 +1,23 @@
 """
 -----------------------------------------------------------------------
 File: scripts/safety_prepro_res.py
-Creation Time: Feb 13th 2025, 1:09 am
+Creation Time: Feb 1st 2025, 1:09 am
 Author: Saurabh Zinjad
 Developer Email: saurabhzinjad@gmail.com
 Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
 -----------------------------------------------------------------------
 """
 
+import torch
 import argparse
+import traceback
+import pandas as pd
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from torch.nn.parallel import DistributedDataParallel
 
-import traceback
 from utils import measure_execution_time, print_log, filter_safety_response
 from config import envs, credentials
-
-import torch
-import pandas as pd
-from transformers import AutoTokenizer, AutoModelForCausalLM
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print_log(f"Device: {device}")
@@ -27,37 +27,46 @@ print_log(f"Device: {device}")
 def moderate_batch(model, tokenizer, texts, batch_size=32):
     output_texts = []
     print_log(f"Started generating text for {len(texts)} texts")
-    # Process texts in batches.
+
+    # Decide if we should call model or model.module
+    model = model.module if hasattr(model, "module") else model
+
     for i in range(0, len(texts), batch_size):
         print_log(f"Processing batch: {i//batch_size}/{len(texts)//batch_size}")
         batch_texts_raw = texts[i : i + batch_size]
         batch_texts = [
             str(text) if not isinstance(text, str) else text for text in batch_texts_raw
         ]
-        # Prepare chat messages if needed. Otherwise, simply batch encode the texts.
-        batch_inputs = tokenizer(
-            batch_texts, return_tensors="pt", padding=True, truncation=True
+
+        # Build chat prompts for each text
+        batch_chats = [{"role": "user", "content": text} for text in batch_texts]
+        # Apply chat template
+        batch_inputs = tokenizer.apply_chat_template(
+            batch_chats, return_tensors="pt", padding=True, truncation=True
         ).to(device)
 
         with torch.no_grad():
-            # Optionally use AMP for faster mixed precision inference.
+            # Use AMP for faster mixed precision inference.
             with torch.amp.autocast(device_type=device):
-                outputs = model.module.generate(
+                outputs = model.generate(
                     input_ids=batch_inputs.input_ids,
                     attention_mask=batch_inputs.attention_mask,
-                    max_new_tokens=100,
-                    pad_token_id=0,
+                    early_stopping=True,
+                    max_new_tokens=5,
+                    pad_token_id=tokenizer.pad_token_id,
+                    temperature=0,
+                    do_sample=False,
                 )
-        # Iterate through batch outputs and apply filtering.
+
+        # Decode each output
         for j, output in enumerate(outputs):
-            # Dynamically determine prompt lengths can be tricky.
-            # If each entry has a different prompt length, consider storing these lengths prior to batching.
-            prompt_length = (batch_inputs.input_ids[j] != tokenizer.pad_token_id).sum()
-            decoded = tokenizer.decode(output[prompt_length:], skip_special_tokens=True)
-            try:
-                decoded = filter_safety_response(decoded)
-            except Exception as e:
-                print_log(f"Error filtering response: {str(e)}", is_error=True)
+            # Calculate how many tokens in the prompt (non-pad tokens)
+            # prompt_length = (batch_inputs.input_ids[j] != tokenizer.pad_token_id).sum()
+            decoded = tokenizer.decode(output, skip_special_tokens=True)
+            # try:
+            #     decoded = filter_safety_response(decoded)
+            # except Exception as e:
+            #     print_log(f"Error filtering response: {str(e)}", is_error=True)
             output_texts.append(decoded)
     return output_texts
 
@@ -82,23 +91,26 @@ def check_safety(dataset_path):
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
         )
+        # Switch to eval mode
+        model.eval()
         model.to(device)
-        # model.half()  # Convert model parameters and buffers to FP16
+        # Convert model parameters and buffers to FP16
+        # model.half()  # or set torch_dtype=torch.float16 in from_pretrained
 
         if torch.cuda.device_count() > 1:
             torch.distributed.init_process_group(backend="nccl")
             model = DistributedDataParallel(model)  # Wrap model for multi-GPU usage
-            # model = nn.DataParallel(model)  # Wrap model for multi-GPU usage
 
         question_col_list = ["perturbed_response_pre", "original_response_pre"]
         data = pd.read_csv(dataset_path)
 
         for question_col in question_col_list:
             print_log(f"Processing column: {question_col}")
-            questions = data[question_col].to_list()
+            questions = data[question_col].fillna("").to_list()
 
             output_texts = moderate_batch(model, tokenizer, questions)
-            print_log(f"Storing response in dataframe")
+            print_log(f"response generation is done for '{question_col}' column")
+
             new_col_name = f"{question_col}_safety"
             if new_col_name in data.columns:
                 data[new_col_name] = output_texts
@@ -108,9 +120,11 @@ def check_safety(dataset_path):
                     new_col_name,
                     output_texts,
                 )
-            print_log(f"Storing {question_col} column in {dataset_path}")
+
+            print_log(f"Storing '{question_col}' column in dataset '{dataset_path}'.")
             data.to_csv(dataset_path, index=False, chunksize=10000)
             print_log(f"{'-'*240}")
+
     except Exception as e:
         print_log(f"An error occurred in generate_answers: {str(e)}", is_error=True)
         print_log(traceback.format_exc(), is_error=True)
