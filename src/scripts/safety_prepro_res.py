@@ -8,88 +8,28 @@ Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com
 -----------------------------------------------------------------------
 """
 
-# torch.no_grad()
-# model.half()
-# torch.cuda.amp.autocast()
-
-import os
 import argparse
-import torch.nn as nn
 from torch.nn.parallel import DistributedDataParallel
 
 import traceback
-from utils import measure_execution_time
+from utils import measure_execution_time, print_log, filter_safety_response
 from config import envs, credentials
 
 import torch
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForCausalLM
-import logging
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-logger.info(f"Device: {device}")
-
-
-def filter_safety_response(label):
-    return label.strip().split()[0].lower()
-
-
-@measure_execution_time
-def moderate(model, tokenizer, texts):
-    try:
-        output_texts = []
-        logger.info(f"Started generating text for {len(texts)} texts")
-        for id, text in enumerate(texts):
-            print(f"Processing: {id}/{len(texts)}")
-            if isinstance(text, str):
-                chat = [{"role": "user", "content": text}]
-                input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
-                    device
-                )
-
-                if hasattr(model, "module"):
-                    output = model.module.generate(
-                        input_ids=input_ids, max_new_tokens=100, pad_token_id=0
-                    )
-                else:
-                    output = model.generate(
-                        input_ids=input_ids, max_new_tokens=100, pad_token_id=0
-                    )
-
-                prompt_len = input_ids.shape[-1]
-                output_text = tokenizer.decode(
-                    output[0][prompt_len:], skip_special_tokens=True
-                )
-                try:
-                    output_text = filter_safety_response(output_text)
-                except Exception as e:
-                    logger.error(f"Error output_text: {output_text}")
-                    logger.error(f"Error filtering response: {str(e)}")
-                    print(f"Error: {e}")
-
-                output_texts.append(output_text)
-            else:
-                output_texts.append("safe")
-        print(f"Uniue Output texts:\n {pd.Series(output_texts).value_counts()}")
-        return output_texts
-    except Exception as e:
-        logger.error(f"Error generating text: {str(e)}")
-        print(f"Error: {e}")
-        return None
+print_log(f"Device: {device}")
 
 
 @measure_execution_time
 def moderate_batch(model, tokenizer, texts, batch_size=32):
     output_texts = []
-    logger.info(f"Started generating text for {len(texts)} texts")
+    print_log(f"Started generating text for {len(texts)} texts")
     # Process texts in batches.
     for i in range(0, len(texts), batch_size):
+        print_log(f"Processing batch: {i//batch_size}/{len(texts)//batch_size}")
         batch_texts_raw = texts[i : i + batch_size]
         batch_texts = [
             str(text) if not isinstance(text, str) else text for text in batch_texts_raw
@@ -117,7 +57,7 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
             try:
                 decoded = filter_safety_response(decoded)
             except Exception as e:
-                logger.error(f"Error filtering response: {str(e)}")
+                print_log(f"Error filtering response: {str(e)}", is_error=True)
             output_texts.append(decoded)
     return output_texts
 
@@ -131,10 +71,12 @@ def check_safety(dataset_path):
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
         )
+
         # Set pad_token to eos_token if it's not set
         if tokenizer.pad_token is None:
-            tokenizer.pad_token = tokenizer.eos_token
-            # tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+            # tokenizer.pad_token = tokenizer.eos_token
+            tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+
         model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path=model_id,
             token=credentials.HF_TOKEN,
@@ -152,11 +94,11 @@ def check_safety(dataset_path):
         data = pd.read_csv(dataset_path)
 
         for question_col in question_col_list:
-            print(f"Processing column: {question_col}")
+            print_log(f"Processing column: {question_col}")
             questions = data[question_col].to_list()
 
             output_texts = moderate_batch(model, tokenizer, questions)
-            print(f"Storing response in dataframe")
+            print_log(f"Storing response in dataframe")
             new_col_name = f"{question_col}_safety"
             if new_col_name in data.columns:
                 data[new_col_name] = output_texts
@@ -166,14 +108,12 @@ def check_safety(dataset_path):
                     new_col_name,
                     output_texts,
                 )
-            print("Storing {question_col} column in {dataset_path}")
+            print_log(f"Storing {question_col} column in {dataset_path}")
             data.to_csv(dataset_path, index=False, chunksize=10000)
-            logger.info("Stored {question_col} column in {dataset_path}")
-            print(f"{'-'*240}")
+            print_log(f"{'-'*240}")
     except Exception as e:
-        logger.error(f"An error occurred in generate_answers: {str(e)}")
-        logger.error(traceback.format_exc())
-        print(f"Error: {e}")
+        print_log(f"An error occurred in generate_answers: {str(e)}", is_error=True)
+        print_log(traceback.format_exc(), is_error=True)
 
 
 if __name__ == "__main__":
