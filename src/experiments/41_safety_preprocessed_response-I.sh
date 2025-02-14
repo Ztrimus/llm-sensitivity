@@ -1,11 +1,12 @@
 #!/bin/bash
 
 #SBATCH -N 1
+#SBATCH -c 1
 #SBATCH -p general
 #SBATCH -q private
 #SBATCH -t 01:00:00
 #SBATCH --gres=gpu:a100:2
-#SBATCH --mem=10G
+#SBATCH --mem=40G
 #SBATCH -o /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.out
 #SBATCH -e /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.err
 #SBATCH --mail-type=ALL
