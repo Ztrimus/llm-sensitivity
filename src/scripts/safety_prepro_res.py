@@ -83,7 +83,7 @@ def check_safety(dataset_path):
             cache_dir=envs.MODELS_DIR,
         )
         model.to(device)
-        model.half()  # Convert model parameters and buffers to FP16
+        # model.half()  # Convert model parameters and buffers to FP16
 
         if torch.cuda.device_count() > 1:
             torch.distributed.init_process_group(backend="nccl")
