@@ -48,12 +48,23 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
             batch_chats, return_tensors="pt", padding=True, truncation=True
         ).to(device)
 
+        # Handle both dict and Tensor output
+        if isinstance(batch_inputs, dict):
+            input_ids = batch_inputs.input_ids
+            attention_mask = batch_inputs.attention_mask
+        elif isinstance(batch_inputs, torch.Tensor):
+            input_ids = batch_inputs
+            # Compute attention_mask based on non-pad tokens
+            attention_mask = (batch_inputs != tokenizer.pad_token_id).long()
+        else:
+            raise ValueError("Unexpected output from tokenizer.apply_chat_template")
+
         with torch.no_grad():
             # Use AMP for faster mixed precision inference.
             with torch.amp.autocast(device_type=device):
                 outputs = model.generate(
-                    input_ids=batch_inputs.input_ids,
-                    attention_mask=batch_inputs.attention_mask,
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
                     early_stopping=True,
                     max_new_tokens=5,
                     pad_token_id=tokenizer.pad_token_id,
