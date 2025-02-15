@@ -65,10 +65,8 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
                 outputs = model.generate(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
-                    early_stopping=True,
                     max_new_tokens=5,
                     pad_token_id=tokenizer.pad_token_id,
-                    temperature=0,
                     do_sample=False,
                 )
 
@@ -95,6 +93,8 @@ def check_safety(dataset_path):
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
         )
+
+        tokenizer.padding_side = "left"
 
         # Set pad_token to eos_token if it's not set
         if tokenizer.pad_token is None:
