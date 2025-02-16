@@ -59,6 +59,9 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
         else:
             raise ValueError("Unexpected output from tokenizer.apply_chat_template")
 
+        print_log(f"Input IDs for first sample: {batch_inputs.input_ids[0]}")
+        print_log(f"Pad token id: {tokenizer.pad_token_id}")
+
         with torch.no_grad():
             # Use AMP for faster mixed precision inference.
             with torch.amp.autocast(device_type=device):
