@@ -61,6 +61,11 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
         else:
             raise ValueError("Unexpected output from tokenizer.apply_chat_template")
 
+        print(f"Length of input ID: {len(input_ids)}")
+        print(f"Length of attention mask: {len(attention_mask)}")
+        print(f"input ID: {input_ids}")
+        print(f"attention mask: {attention_mask}")
+
         with torch.no_grad():
             # Use AMP for faster mixed precision inference.
             with torch.amp.autocast(device_type=device):
@@ -102,6 +107,7 @@ def check_safety(dataset_path):
         if tokenizer.pad_token is None:
             # tokenizer.pad_token = tokenizer.eos_token
             tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+            model.resize_token_embeddings(len(tokenizer))
 
         model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path=model_id,
