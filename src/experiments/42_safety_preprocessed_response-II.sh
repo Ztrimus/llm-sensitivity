@@ -4,7 +4,7 @@
 #SBATCH -p general
 #SBATCH -q public
 #SBATCH -t 16:00:00
-#SBATCH --gres=gpu:a100:2
+#SBATCH --gres=gpu:a100:1
 #SBATCH --mem=80G
 #SBATCH -o /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.out
 #SBATCH -e /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.err
@@ -15,4 +15,4 @@ source deactivate
 source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
-python3 src/scripts/safety_prepro_res.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa2.csv
+python3 src/scripts/safety_prepro_res.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa_sample.csv

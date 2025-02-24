@@ -23,6 +23,30 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print_log(f"Device: {device}")
 
 
+def moderate(model, tokenizer, texts):
+    try:
+        output_texts = []
+        for id, text in enumerate(texts):
+            print_log(f"{'='*15} {id+1}/{len(texts)} text: {text}")
+
+            chat = [{"role": "user", "content": text}]
+            input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
+                device
+            )
+            output = model.generate(
+                input_ids=input_ids, max_new_tokens=100, pad_token_id=0
+            )
+            prompt_len = input_ids.shape[-1]
+            output_text = tokenizer.decode(
+                output[0][prompt_len:], skip_special_tokens=True
+            )
+            output_texts.append(output_text)
+        return output_texts
+    except Exception as e:
+        print_log(f"Error generating text: {str(e)}", is_error=True)
+        return None
+
+
 @measure_execution_time
 def moderate_batch(model, tokenizer, texts, batch_size=32):
     output_texts = []
@@ -101,29 +125,21 @@ def check_safety(dataset_path):
             cache_dir=envs.MODELS_DIR,
         )
 
-        tokenizer.padding_side = "left"
-
-        # Set pad_token to eos_token if it's not set
-        if tokenizer.pad_token is None:
-            # tokenizer.pad_token = tokenizer.eos_token
-            tokenizer.add_special_tokens({"pad_token": "[PAD]"})
-            model.resize_token_embeddings(len(tokenizer))
+        # # Set pad_token to eos_token if it's not set
+        # if tokenizer.pad_token is None:
+        #     # tokenizer.pad_token = tokenizer.eos_token
+        #     tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+        #     model.resize_token_embeddings(len(tokenizer))
 
         model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path=model_id,
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
             torch_dtype=torch.float16,
+            device_map="auto",
         )
         # Switch to eval mode
         model.eval()
-        model.to(device)
-        # Convert model parameters and buffers to FP16
-        # model.half()  # or set torch_dtype=torch.float16 in from_pretrained
-
-        if torch.cuda.device_count() > 1:
-            torch.distributed.init_process_group(backend="nccl")
-            model = DistributedDataParallel(model)  # Wrap model for multi-GPU usage
 
         question_col_list = ["perturbed_response_pre", "original_response_pre"]
         data = pd.read_csv(dataset_path)
@@ -132,7 +148,7 @@ def check_safety(dataset_path):
             print_log(f"Processing column: {question_col}")
             questions = data[question_col].fillna("").to_list()
 
-            output_texts = moderate_batch(model, tokenizer, questions)
+            output_texts = moderate(model, tokenizer, questions)
             print_log(f"response generation is done for '{question_col}' column")
 
             new_col_name = f"{question_col}_safety"
