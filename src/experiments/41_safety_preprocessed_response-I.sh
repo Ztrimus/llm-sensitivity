@@ -1,25 +1,33 @@
 #!/bin/bash
-
-#SBATCH -N 1
-#SBATCH -c 1
+#SBATCH -N 1                          # Single node
+#SBATCH --gres=gpu:a100:4             # 4 A100s per node
+#SBATCH -c 8                          # 8 CPUs per GPU
+#SBATCH --mem=320G                    # ~80GB per GPU
 #SBATCH -p general
 #SBATCH -q private
 #SBATCH -t 01:00:00
-#SBATCH --gres=gpu:a100:2
-#SBATCH --mem=80G
-#SBATCH -o /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.out
-#SBATCH -e /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.err
+#SBATCH -o /path/to/slurm.%j.out
+#SBATCH -e /path/to/slurm.%j.err
 #SBATCH --mail-type=ALL
 
+# --- Core Modules ---
 module load mamba/latest
+module load cuda/12.2
 source deactivate
 source activate llm_safety_39
+
+# --- Accelerate Configuration ---
+export HF_HOME=/scratch/$USER/cache/huggingface
+export CUDA_LAUNCH_BLOCKING=0         # Disable for performance
+export TORCH_USE_CUDA_DSA=0           # Disable debug mode
+
+# --- Job Execution ---
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
-export RANK=0
-export WORLD_SIZE=1
-export MASTER_ADDR=127.0.0.1
-export MASTER_PORT=29500
-export CUDA_LAUNCH_BLOCKING=1
-export TORCH_USE_CUDA_DSA=1
-python3 src/scripts/safety_prepro_res.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa_sample.csv
+
+accelerate launch \
+  --num_processes 4 \
+  --mixed_precision fp16 \
+  --multi_gpu \
+  src/scripts/safety_prepro_res.py \
+  --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa_sample.csv
