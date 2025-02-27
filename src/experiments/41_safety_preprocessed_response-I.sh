@@ -25,9 +25,9 @@ export TORCH_USE_CUDA_DSA=0           # Disable debug mode
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
 
-accelerate launch \
-  --num_processes 4 \
-  --mixed_precision fp16 \
-  --multi_gpu \
-  src/scripts/safety_prepro_res.py \
-  --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa_sample.csv
+# accelerate launch \
+#   --num_processes 4 \
+#   --mixed_precision fp16 \
+#   --multi_gpu \
+#   src/scripts/safety_prepro_res.py \
+#   --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa_sample.csv

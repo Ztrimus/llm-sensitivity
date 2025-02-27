@@ -95,13 +95,11 @@
 			"name": "safety-questions",
 			"type": "debugpy",
 			"request": "launch",
-			"program": "${workspaceFolder}/src/scripts/safety.py",
+			"program": "${workspaceFolder}/src/scripts/safety_prepro_res-simple.py",
 			"console": "integratedTerminal",
 			"args": [
 				"--dataset_path",
-				"/home/szinjad/llm-sensitivity/data/perturbed/catHarmQA",
-				"--is_perturbed_question",
-				"True"
+				"/scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa_sample.csv"
 			],
 			"justMyCode": true
 		},

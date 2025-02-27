@@ -8,13 +8,15 @@ Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com
 -----------------------------------------------------------------------
 """
 
+import os
+import time
 import torch
 import argparse
 import traceback
+import subprocess
 import pandas as pd
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from torch.nn.parallel import DistributedDataParallel
 
 from utils import measure_execution_time, print_log, filter_safety_response
 from config import envs, credentials
@@ -27,7 +29,7 @@ def moderate(model, tokenizer, texts):
     try:
         output_texts = []
         for id, text in enumerate(texts):
-            print_log(f"{'='*15} {id+1}/{len(texts)} text: {text}")
+            print_log(f"{'='*15} {id+1}/{len(texts)}")
 
             chat = [{"role": "user", "content": text}]
             input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
@@ -40,6 +42,7 @@ def moderate(model, tokenizer, texts):
             output_text = tokenizer.decode(
                 output[0][prompt_len:], skip_special_tokens=True
             )
+            output_text = filter_safety_response(output_text)
             output_texts.append(output_text)
         return output_texts
     except Exception as e:
@@ -117,53 +120,77 @@ def moderate_batch(model, tokenizer, texts, batch_size=32):
 
 def check_safety(dataset_path):
     try:
-        model_id = "meta-llama/Llama-Guard-3-8B"
+        # Overall allocated time (in seconds)
+        allocated_time = 16 * 3600  # 16 hours
+        start_time = time.time()
 
+        model_id = "meta-llama/Llama-Guard-3-8B"
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path=model_id,
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
         )
 
-        # # Set pad_token to eos_token if it's not set
-        # if tokenizer.pad_token is None:
-        #     # tokenizer.pad_token = tokenizer.eos_token
-        #     tokenizer.add_special_tokens({"pad_token": "[PAD]"})
-        #     model.resize_token_embeddings(len(tokenizer))
-
         model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path=model_id,
             token=credentials.HF_TOKEN,
             cache_dir=envs.MODELS_DIR,
             torch_dtype=torch.float16,
-            device_map="auto",
-        )
-        # Switch to eval mode
-        model.eval()
+            # device_map="auto",
+        ).to(device)
+        model.eval() # Switch to eval mode
 
         question_col_list = ["perturbed_response_pre", "original_response_pre"]
         data = pd.read_csv(dataset_path)
 
-        for question_col in question_col_list:
-            print_log(f"Processing column: {question_col}")
-            questions = data[question_col].fillna("").to_list()
+        if "category" not in data.columns:
+            print_log("Column 'category' not found in dataset.", is_error=True)
+            return
+        
+        # Create a "category-wise" folder inside the dataset's directory.
+        dataset_dir = os.path.dirname(dataset_path)
+        cat_folder = os.path.join(dataset_dir, "category-wise")
+        os.makedirs(cat_folder, exist_ok=True)
 
-            output_texts = moderate(model, tokenizer, questions)
-            print_log(f"response generation is done for '{question_col}' column")
+        categories = data["category"].unique()
+        for category in categories:
+            cat_file_path = os.path.join(cat_folder, f"{category.replace('/', '_')}.csv")
+            if os.path.exists(cat_file_path):
+                print_log(f"Category '{category}' is already processed. Skipping.")
+                continue
 
-            new_col_name = f"{question_col}_safety"
-            if new_col_name in data.columns:
-                data[new_col_name] = output_texts
-            else:
-                data.insert(
-                    data.columns.get_loc(question_col) + 1,
-                    new_col_name,
-                    output_texts,
-                )
+            print_log(f"Processing category: {category}")
+            cat_data = data[data["category"] == category].copy()
 
-            print_log(f"Storing '{question_col}' column in dataset '{dataset_path}'.")
-            data.to_csv(dataset_path, index=False, chunksize=10000)
+            for question_col in question_col_list:   
+                print_log(f"Processing column: {question_col} for category '{category}'")
+                questions = cat_data[question_col].fillna("").to_list()
+
+                output_texts = moderate(model, tokenizer, questions)
+                print_log(f"Response generation is done for '{question_col}' column in category '{category}'")
+
+                new_col_name = f"{question_col}_safety"
+                if new_col_name in cat_data.columns:
+                    cat_data[new_col_name] = output_texts
+                else:
+                    cat_data.insert(
+                        cat_data.columns.get_loc(question_col) + 1,
+                        new_col_name,
+                        output_texts,
+                    )
+
+            cat_data.to_csv(cat_file_path, index=False, chunksize=10000)
+            print_log(f"Stored processed category data for '{category}' in file: '{cat_file_path}'.")
             print_log(f"{'-'*240}")
+
+            # After finishing this category, check overall remaining time.
+            elapsed = time.time() - start_time
+            remaining_time = allocated_time - elapsed
+
+            if len(categories) != len(os.listdir(cat_folder)) and remaining_time < elapsed:
+                print_log("Not enough time to process the next column. Triggering subprocess.", is_error=False)
+                subprocess.run(["sbatch", "src/experiments/42_safety_preprocessed_response-II.sh"])
+                break
 
     except Exception as e:
         print_log(f"An error occurred in generate_answers: {str(e)}", is_error=True)

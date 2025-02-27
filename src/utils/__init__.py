@@ -84,4 +84,7 @@ def split_string_into_list(text: str) -> list:
 
 
 def filter_safety_response(label):
-    return label.strip().split()[0].lower()
+    if label.strip():
+        return label.strip().split()[0].lower()
+    else:
+        return label
