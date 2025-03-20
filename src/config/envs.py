@@ -16,3 +16,10 @@ SAFETY_QUESTIONS_DATA_DIR = (
     f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/safety/catHarmQA/questions"
 )
 MAX_RESPONSE_LEN = 256
+
+GENERATED_DATA_DIR_XSTEST = (
+    f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/generated/xstest/"
+)
+SAFETY_DATA_DIR_XSTEST = (
+    f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/safety/xstest"
+)

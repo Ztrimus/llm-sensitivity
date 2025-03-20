@@ -95,9 +95,15 @@ def check_safety(
 
                 if not is_perturbed_questions:
                     question_col_list = [df.columns[-1]]
-                    output_dir_path = envs.SAFETY_DATA_DIR
+                    output_dir_path = (
+                        envs.SAFETY_DATA_DIR_XSTEST
+                        if "xstest" in dataset_path
+                        else envs.SAFETY_DATA_DIR
+                    )
                 else:
-                    question_col_list = [column for column in df.columns if column.startswith("Question")]
+                    question_col_list = [
+                        column for column in df.columns if column.startswith("Question")
+                    ]
                     output_dir_path = envs.SAFETY_QUESTIONS_DATA_DIR
 
                 for question_col in question_col_list:

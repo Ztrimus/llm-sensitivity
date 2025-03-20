@@ -128,9 +128,15 @@ def generate_answers(
                 new_col_name = f"{question_col}_{model_name}"
                 df[new_col_name] = output_texts
 
-                df = df[main_columns + [question_col, new_col_name]]
+                if main_columns[0] in df.columns:
+                    df = df[main_columns + [question_col, new_col_name]]
+
                 output_path = os.path.join(
-                    envs.GENERATED_DATA_DIR,
+                    (
+                        envs.GENERATED_DATA_DIR_XSTEST
+                        if "xstest" in dataset_path
+                        else envs.GENERATED_DATA_DIR
+                    ),
                     f"{Path(dataset_path).stem}_{model_name}_{question_col}.csv",
                 )
                 logger.info(f"Saving results to {output_path}")
