@@ -21,4 +21,5 @@ python3 src/scripts/generation.py --model mistral --dataset_path /scratch/szinja
 python3 src/scripts/generation.py --model llama3 --dataset_path /scratch/szinjad/llm-sensitivity/data/original/XSTest/xstest.csv --question_columns prompt
 python3 src/scripts/generation.py --model llama31 --dataset_path /scratch/szinjad/llm-sensitivity/data/original/XSTest/xstest.csv --question_columns prompt
 python3 src/scripts/generation.py --model gemma2 --dataset_path /scratch/szinjad/llm-sensitivity/data/original/XSTest/xstest.csv --question_columns prompt
-python3 src/scripts/safety.py --dataset_path /home/szinjad/llm-sensitivity/data/generated/xstest --is_perturbed_question False
+
+python3 src/scripts/safety.py --dataset_path /scratch/szinjad/llm-sensitivity/data/generated/xstest --is_perturbed_question False
