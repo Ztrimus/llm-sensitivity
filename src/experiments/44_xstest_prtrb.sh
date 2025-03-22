@@ -4,7 +4,7 @@
 #SBATCH -c 1
 #SBATCH -p general
 #SBATCH -q public
-#SBATCH -t 4:00:00
+#SBATCH -t 16:00:00
 #SBATCH --gres=gpu:a100:1
 #SBATCH --mem=80G
 #SBATCH -o /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.out
