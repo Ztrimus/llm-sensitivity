@@ -20,4 +20,4 @@ python3 src/scripts/generation.py --model llama2 --dataset_path /scratch/szinjad
 python3 src/scripts/generation.py --model mistral --dataset_path /scratch/szinjad/llm-sensitivity/data/perturbed/xstest/xstest_sntnc.csv --question_columns prompt_sntnc_bck_trnsltn,prompt_sntnc_paraphrase
 python3 src/scripts/generation.py --model gemma2 --dataset_path /scratch/szinjad/llm-sensitivity/data/perturbed/xstest/xstest_sntnc.csv --question_columns prompt_sntnc_bck_trnsltn,prompt_sntnc_paraphrase
 python3 src/scripts/generation.py --model llama3 --dataset_path /scratch/szinjad/llm-sensitivity/data/perturbed/xstest/xstest_sntnc.csv --question_columns prompt_sntnc_bck_trnsltn,prompt_sntnc_paraphrase
-python3 src/scripts/generation.py --model llama3.1 --dataset_path /scratch/szinjad/llm-sensitivity/data/perturbed/xstest/xstest_sntnc.csv --question_columns prompt_sntnc_bck_trnsltn,prompt_sntnc_paraphrase
+python3 src/scripts/generation.py --model llama31 --dataset_path /scratch/szinjad/llm-sensitivity/data/perturbed/xstest/xstest_sntnc.csv --question_columns prompt_sntnc_bck_trnsltn,prompt_sntnc_paraphrase
