@@ -39,6 +39,7 @@ logger.info("Device: %s", device)
 print(f"Device: {device}")
 
 main_columns = ["Category", "Subcategory", "Question"]
+main_columns_xstest = ["note", "focus", "prompt", "type"]
 
 
 def get_model_and_tokenizer(model_config, auth_token, cache_dir):
@@ -131,6 +132,9 @@ def generate_answers(
                 if main_columns[0] in df.columns:
                     df = df[main_columns + [question_col, new_col_name]]
 
+                if main_columns_xstest[0] in df.columns:
+                    df = df[main_columns_xstest + [question_col, new_col_name]]
+
                 output_path = os.path.join(
                     (
                         envs.GENERATED_DATA_DIR_XSTEST
@@ -159,7 +163,9 @@ def generate(tokenizer, model, query: str = None, temp=None, top_p=None):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run perturbation experiments.")
+    parser = argparse.ArgumentParser(
+        description="Run LLM response generation on give questions."
+    )
     parser.add_argument(
         "--dataset_path", type=str, default=None, help="Path to the dataset file."
     )
