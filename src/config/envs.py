@@ -21,7 +21,7 @@ GENERATED_DATA_DIR_XSTEST = (
     f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/generated/xstest/"
 )
 SAFETY_DATA_DIR_XSTEST = (
-    f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/safety/xstest"
+    f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/safety/xstest/response"
 )
 PERTURBED_DATA_DIR_XSTEST = (
     f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/perturbed/xstest"
