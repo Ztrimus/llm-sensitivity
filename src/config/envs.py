@@ -26,3 +26,6 @@ SAFETY_DATA_DIR_XSTEST = (
 PERTURBED_DATA_DIR_XSTEST = (
     f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/perturbed/xstest"
 )
+SAFETY_QUESTIONS_DATA_DIR_XSTEST = (
+    f"/scratch/{credentials.ASURITE_ID}/llm-sensitivity/data/safety/xstest/questions"
+)

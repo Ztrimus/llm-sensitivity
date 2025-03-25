@@ -88,3 +88,11 @@ def filter_safety_response(label):
         return label.strip().split()[0].lower()
     else:
         return label
+
+
+def is_not_exist_create_dir(directory: str):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        print_log(f"Directory created: {directory}")
+    else:
+        print_log(f"Directory already exists: {directory}")
