@@ -16,7 +16,7 @@ source deactivate
 source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
-python3 src/scripts/safety.py --dataset_path /home/szinjad/llm-sensitivity/data/perturbed/xstest --is_perturbed_question True
+python3 src/scripts/safety.py --dataset_path /scratch/szinjad/llm-sensitivity/data/perturbed/xstest --is_perturbed_question True
 
 
 
