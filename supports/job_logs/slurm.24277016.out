@@ -1,0 +1,71 @@
+Filtered datasets: ['xstest_char_llama3_prompt_char_random_delete_n5.csv', 'xstest_char_llama2_prompt_char_random_insert_n5.csv', 'xstest_sntnc_llama31_prompt_sntnc_paraphrase.csv', 'xstest_word_llama31_prompt_word_random_insert_cwe_n1.csv', 'xstest_llama2_prompt.csv', 'xstest_char_llama31_prompt_char_random_delete_n5.csv', 'xstest_char_mistral_prompt_char_random_delete_n5.csv', 'xstest_sntnc_mistral_prompt_sntnc_paraphrase.csv', 'xstest_word_llama2_prompt_word_random_substitute_emb_n1.csv', 'xstest_mistral_prompt.csv', 'xstest_word_gemma2_prompt_word_random_substitute_emb_n1.csv', 'xstest_char_gemma2_prompt_char_random_delete_n5.csv', 'xstest_sntnc_llama3_prompt_sntnc_bck_trnsltn.csv', 'xstest_char_mistral_prompt_char_random_insert_n5.csv', 'xstest_sntnc_llama31_prompt_sntnc_bck_trnsltn.csv', 'xstest_llama3_prompt.csv', 'xstest_sntnc_gemma2_prompt_sntnc_bck_trnsltn.csv', 'xstest_word_gemma2_prompt_word_random_insert_cwe_n1.csv', 'xstest_word_llama3_prompt_word_random_substitute_emb_n1.csv', 'xstest_char_llama3_prompt_char_random_insert_n5.csv', 'xstest_sntnc_llama2_prompt_sntnc_bck_trnsltn.csv', 'xstest_char_llama31_prompt_char_random_insert_n5.csv', 'xstest_llama31_prompt.csv', 'xstest_word_llama3_prompt_word_random_insert_cwe_n1.csv', 'xstest_char_llama2_prompt_char_random_delete_n5.csv', 'xstest_word_llama31_prompt_word_random_substitute_emb_n1.csv', 'xstest_sntnc_llama3_prompt_sntnc_paraphrase.csv', 'xstest_char_gemma2_prompt_char_random_insert_n5.csv', 'xstest_gemma2_prompt.csv', 'xstest_word_llama2_prompt_word_random_insert_cwe_n1.csv', 'xstest_sntnc_mistral_prompt_sntnc_bck_trnsltn.csv', 'xstest_sntnc_gemma2_prompt_sntnc_paraphrase.csv', 'xstest_word_mistral_prompt_word_random_insert_cwe_n1.csv', 'xstest_word_mistral_prompt_word_random_substitute_emb_n1.csv', 'xstest_sntnc_llama2_prompt_sntnc_paraphrase.csv']
+Function moderate took 2 minutes, 8.7775 seconds to execute
+Directory created: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 6.9350 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 3.9830 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.7465 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 44.9472 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.9768 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 44.5782 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 50.4038 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 37.1841 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 49.9029 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 44.4581 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 15.0446 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.6788 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 44.5466 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 3.0447 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.3678 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 47.3243 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 47.8754 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.3822 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.7217 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 18.0236 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 3.1886 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.7790 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.6911 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 40.0732 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 2.8657 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 2 minutes, 3.0946 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 43.2306 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 46.8411 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 47.2550 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 50.0431 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 44.7222 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 43.9938 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 45.2858 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
+Function moderate took 1 minute, 47.1688 seconds to execute
+Directory already exists: /scratch/szinjad/llm-sensitivity/data/safety/xstest/response
