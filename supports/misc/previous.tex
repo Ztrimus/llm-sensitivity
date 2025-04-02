@@ -1,0 +1,67 @@
+/*
+ * -----------------------------------------------------------------------
+ * File: misc/previous.tex
+ * Creation Time: Mar 27th 2025, 11:36 pm
+ * Author: Saurabh Zinjad
+ * Developer Email: saurabhzinjad@gmail.com
+ * Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
+ * -----------------------------------------------------------------------
+ */
+
+  \section{Section1}
+  This literature review synthesizes research on the sensitivity of Large Language Models (LLMs) to input perturbations and their implications for safety. The review focuses on studies that explore how variations in input—such as typos, grammatical errors, or rephrasing—affect model outputs, particularly in high-stakes domains.
+
+1. Sensitivity to Input Perturbations
+Character-Level Perturbations
+
+Goel et al. (2021) demonstrated that character-level perturbations, such as spelling errors and random insertions, significantly degrade the performance of models like BERT and RoBERTa. These perturbations often expose tokenization vulnerabilities, leading to unsafe or nonsensical outputs.
+
+In a related study, Zhu et al. (2024) found that Optical Character Recognition (OCR) and Automatic Speech Recognition (ASR) errors caused substantial performance drops in LLMs like ChatGPT-3.5 and Mistral-7B. The study highlighted tokenization issues as a primary cause of unsafe behavior under noisy inputs.
+
+Word-Level Perturbations
+
+Zhao et al. (2024) observed that word-level changes, such as synonym substitutions or random word insertions, introduced the highest variability in unsafe outputs across models like LLaMA2 and LLaMA3. Random insertions were particularly risky, often altering the context of prompts in ways that bypassed safety filters.
+
+Sclar et al. (2024) quantified the impact of spurious features in prompts, reporting up to 76% accuracy variance in LLaMA2-13B due to minor formatting changes, underscoring the sensitivity of models to word-level alterations.
+
+Sentence-Level Perturbations
+
+Sentence-level paraphrasing emerged as a safer perturbation strategy in multiple studies. For instance, Xu et al. (2024) proposed a Prompt Perturbation Consistency Learning framework that reduced unsafe outputs by aligning perturbed inputs with training data distributions.
+
+Wang et al. (2023) explored the effects of sentence reordering in multiple-choice questions, finding that such changes amplified positional biases but were less likely to produce unsafe responses compared to character- or word-level perturbations.
+
+2. Safety Implications of Perturbation Sensitivity
+Bypassing Safety Mechanisms
+
+Andriushchenko and Flammarion (2024) revealed that simple tense reformulations (e.g., changing "How to make a bomb?" to "How did people make bombs?") bypassed safety filters in models like GPT-4o and LLaMA3 with alarming consistency. This highlights the brittleness of current alignment techniques against semantic shifts caused by perturbations.
+
+Bias Amplification and Misinterpretation
+
+Studies by Zhang et al. (2024) using Concept Activation Vectors showed that safety mechanisms activate only in deeper layers of LLMs, making early-layer embeddings vulnerable to adversarial manipulations. This can amplify biases or misclassify malicious inputs as benign under specific perturbations.
+
+Robustness Tradeoffs
+
+Fine-tuning for safety often reduces model helpfulness under perturbed inputs. For example, Wei et al. (2023) found that robust refusal training improved safety but increased over-refusals by 41%, limiting the model's utility in benign scenarios.
+
+3. Mitigation Strategies for Robustness
+Consistency Learning Approaches
+
+Xu et al.’s (2024) Prompt Perturbation Consistency Learning introduced dual-input training with a Jensen-Shannon divergence loss to ensure consistent predictions across original and perturbed inputs. This method significantly reduced unsafe outputs without degrading overall performance.
+
+Adversarial Training on Refusal Features
+
+A novel approach by Chen et al. (2024) involved adversarial training on refusal features—hidden embeddings that encode rejection behaviors—to fortify models against alignment-breaking attacks.
+
+Self-Curation and Backtranslation Techniques
+
+Peng et al. (2024) proposed self-alignment methods using instruction backtranslation to create robust training datasets, ensuring safer outputs even under noisy or ambiguous inputs.
+
+4. Emerging Trends and Research Gaps
+Despite significant progress, several challenges remain:
+
+Multilingual Sensitivity: Most studies focus on English inputs, leaving gaps in understanding how non-Latin scripts affect LLM robustness under perturbations.
+
+Dynamic Evaluation Frameworks: Few studies explore real-time robustness evaluations under continuously evolving input scenarios.
+
+Ethical Implications: Balancing bias reduction with language understanding remains an unresolved issue, particularly when mitigating unsafe outputs introduces over-cautious refusals.
+  \section{Section2}
