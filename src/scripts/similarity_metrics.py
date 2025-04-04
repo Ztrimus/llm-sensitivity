@@ -51,55 +51,66 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
+def add_latent_similarity(data: pd.DataFrame):
+    latent_similarities = []
+
+    # Load USE model
+    embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+
+    # # Compute USE embeddings for all questions at once (vectorized)
+    # embeddings = embed(data[["original_question", "perturbed_question"]].values.tolist())
+
+    # Compute USE embeddings for each question column separately.
+    original_embeds = embed(data["original_question"].tolist())
+    perturbed_embeds = embed(data["perturbed_question"].tolist())
+
+    # Cosine similarity in latent space
+    for i in range(len(data)):
+        cosine_sim = np.dot(original_embeds[i], perturbed_embeds[i]) / (
+            np.linalg.norm(original_embeds[i]) * np.linalg.norm(perturbed_embeds[i])
+        )
+        latent_similarities.append(cosine_sim)
+
+    print(f"Latent space similarity computed for {len(data)} rows.")
+
+    # Store results in dataframe
+    data["latent_similarity"] = latent_similarities
+
+    return data
+
+
+def add_token_similarity(data: pd.DataFrame):
+    token_similarities = []
+
+    # Compute similarities
+    for i in range(len(data)):
+        og = data.iloc[i]["original_question"]
+        cf = data.iloc[i]["perturbed_question"]
+
+        # Token-level similarity (Levenshtein distance)
+        token_sim = editdistance.eval(og, cf) / max(len(og), len(cf))
+        token_similarities.append(token_sim)
+
+    print(f"Token-level similarity computed for {len(data)} rows.")
+    # Store results in dataframe
+    data["token_similarity"] = token_similarities
+
+    return data
+
+
 @measure_execution_time
 def get_similarity(dataset_path):
     try:
         # Load dataset
         data = pd.read_csv(dataset_path)
 
-        latent_similarities = []
-
-        # Load USE model
-        embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
-
-        # # Compute USE embeddings for all questions at once (vectorized)
-        # embeddings = embed(
-        #     data[["original_question", "perturbed_question"]].values.tolist()
-        # )
-        # Compute USE embeddings for each question column separately.
-        original_embeds = embed(data["original_question"].tolist())
-        perturbed_embeds = embed(data["perturbed_question"].tolist())
-
-        # Cosine similarity in latent space
-        for i in range(len(data)):
-            cosine_sim = np.dot(original_embeds[i], perturbed_embeds[i]) / (
-                np.linalg.norm(original_embeds[i]) * np.linalg.norm(perturbed_embeds[i])
-            )
-            latent_similarities.append(cosine_sim)
-
-        print(f"Latent space similarity computed for {len(data)} rows.")
-
-        # Store results in dataframe
-        data["latent_similarity"] = latent_similarities
+        data = add_latent_similarity(data)
 
         # Save to CSV
         data.to_csv(dataset_path, index=False)
         print(f"Updated dataset saved at {dataset_path}")
 
-        token_similarities = []
-
-        # Compute similarities
-        for i in range(len(data)):
-            og = data.iloc[i]["original_question"]
-            cf = data.iloc[i]["perturbed_question"]
-
-            # Token-level similarity (Levenshtein distance)
-            token_sim = editdistance.eval(og, cf) / max(len(og), len(cf))
-            token_similarities.append(token_sim)
-
-        print(f"Token-level similarity computed for {len(data)} rows.")
-        # Store results in dataframe
-        data["token_similarity"] = token_similarities
+        data = add_token_similarity(data)
 
         # Save to CSV
         data.to_csv(dataset_path, index=False)
