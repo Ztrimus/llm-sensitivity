@@ -6,7 +6,7 @@
 #SBATCH -q public
 #SBATCH -t 4:00:00
 #SBATCH --gres=gpu:a100:1
-#SBATCH --mem=80G
+#SBATCH --mem=50G
 #SBATCH -o /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.out
 #SBATCH -e /scratch/szinjad/llm-sensitivity/supports/job_logs/slurm.%j.err
 #SBATCH --mail-type=ALL
