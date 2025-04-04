@@ -43,6 +43,7 @@ def moderate(model, tokenizer, texts):
     try:
         output_texts = []
         for id, text in enumerate(texts):
+            text = text if not text else ""
             logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
 
             chat = [{"role": "user", "content": text}]

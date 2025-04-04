@@ -80,14 +80,17 @@ def get_dataframe(dataset_path: str) -> pd.DataFrame:
 
 
 def split_string_into_list(text: str) -> list:
-    return [i.strip() for i in text.split(",")]
+    if isinstance(text, str) and len(text.strip()) > 0:
+        return [i.strip() for i in text.split(",")]
+    else:
+        return []
 
 
 def filter_safety_response(label):
-    if label.strip():
+    if isinstance(label, str) and len(label.strip()) > 0:
         return label.strip().split()[0].lower()
     else:
-        return label
+        return "safe"
 
 
 def is_not_exist_create_dir(directory: str):
