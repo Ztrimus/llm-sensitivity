@@ -16,5 +16,5 @@ source deactivate
 source activate llm_safety_39
 cd /scratch/szinjad/llm-sensitivity
 export PYTHONPATH=$(pwd)/src
-python3 src/scripts/refusal_detection.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/xstest/combined_xstest.csv
-python3 src/scripts/refusal_detection.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa.csv
+python3 src/scripts/refusal_detection.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/xstest/combined_xstest.csv --question_columns original_response, perturbed_response
+python3 src/scripts/refusal_detection.py --dataset_path /scratch/szinjad/llm-sensitivity/data/analyzed/catHarmQA/combined_catqa.csv --question_columns original_response_pre, perturbed_response_pre
