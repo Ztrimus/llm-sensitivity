@@ -8,3 +8,4 @@ data/analyzed/catHarmQA/combined_catqa_refusal.csv
 data/analyzed/catHarmQA/combined_catqa_old.csv
 .qodo/
 .qodo
+data/analyzed/catHarmQA/Perturbation_Experiments_Data.csv
