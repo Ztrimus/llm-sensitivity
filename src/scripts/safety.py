@@ -13,7 +13,13 @@ import os
 import argparse
 import traceback
 from typing import List
-from utils import get_dataframe, split_string_into_list, measure_execution_time
+from utils import (
+    get_dataframe,
+    split_string_into_list,
+    measure_execution_time,
+    print_log,
+    is_not_exist_create_dir,
+)
 from config import envs, credentials, models
 from pathlib import Path
 
@@ -37,6 +43,7 @@ def moderate(model, tokenizer, texts):
     try:
         output_texts = []
         for id, text in enumerate(texts):
+            text = text if not text else ""
             logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
 
             chat = [{"role": "user", "content": text}]
@@ -85,6 +92,7 @@ def check_safety(
                 for dataset in os.listdir(data_dir_path)
                 if all(filter in dataset for filter in filters)
             ]
+        print_log(f"Filtered datasets: {datasets}")
 
         for dataset in datasets:
             dataset_path = os.path.join(data_dir_path, dataset)
@@ -95,10 +103,26 @@ def check_safety(
 
                 if not is_perturbed_questions:
                     question_col_list = [df.columns[-1]]
-                    output_dir_path = envs.SAFETY_DATA_DIR
+                    output_dir_path = (
+                        envs.SAFETY_DATA_DIR_XSTEST
+                        if "xstest" in dataset_path
+                        else envs.SAFETY_DATA_DIR
+                    )
                 else:
-                    question_col_list = [column for column in df.columns if column.startswith("Question")]
-                    output_dir_path = envs.SAFETY_QUESTIONS_DATA_DIR
+                    if "xstest" in data_dir_path:
+                        question_col_list = [
+                            column
+                            for column in df.columns
+                            if column.startswith("prompt")
+                        ]
+                        output_dir_path = envs.SAFETY_QUESTIONS_DATA_DIR_XSTEST
+                    else:
+                        question_col_list = [
+                            column
+                            for column in df.columns
+                            if column.startswith("Question")
+                        ]
+                        output_dir_path = envs.SAFETY_QUESTIONS_DATA_DIR
 
                 for question_col in question_col_list:
                     logger.info(f"{'='*5} Processing column {question_col}")
@@ -112,6 +136,8 @@ def check_safety(
                         new_col_name,
                         output_texts,
                     )
+
+                    is_not_exist_create_dir(output_dir_path)
 
                     output_path = os.path.join(
                         output_dir_path,

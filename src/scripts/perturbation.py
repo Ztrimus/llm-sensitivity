@@ -317,7 +317,11 @@ def perturb_questions(
                             df[current_col_name] = current_col
 
             output_path = os.path.join(
-                envs.PERTURBED_DATA_DIR,
+                (
+                    envs.PERTURBED_DATA_DIR_XSTEST
+                    if "xstest" in dataset_path
+                    else envs.PERTURBED_DATA_DIR
+                ),
                 f"{Path(dataset_path).stem}_{perturb_level}.csv",
             )
             df.to_csv(output_path, index=False)

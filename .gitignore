@@ -3,4 +3,9 @@
 __pycache__/
 *.py[cod]
 src/config/credentials.py
-data/analyzed/catHarmQA/combined_catqa_sample.csv
+data/analyzed/catHarmQA/combined_catqa.csv
+data/analyzed/catHarmQA/combined_catqa_refusal.csv
+data/analyzed/catHarmQA/combined_catqa_old.csv
+.qodo/
+.qodo
+data/analyzed/catHarmQA/Perturbation_Experiments_Data.csv

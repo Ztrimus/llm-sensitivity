@@ -28,10 +28,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-logger.info(f"Device: {device}")
+if torch.cuda.is_available():
+    device = "cuda"
+elif torch.backends.mps.is_available():
+    device = "mps"
+else:
+    device = "cpu"
+
+logger.info("Device: %s", device)
+print(f"Device: {device}")
 
 main_columns = ["Category", "Subcategory", "Question"]
+main_columns_xstest = ["note", "focus", "prompt", "type"]
 
 
 def get_model_and_tokenizer(model_config, auth_token, cache_dir):
@@ -67,21 +75,26 @@ def get_model_and_tokenizer(model_config, auth_token, cache_dir):
 
 
 @measure_execution_time
-def generate_text(model, tokenizer, texts):
+def generate_text(model, tokenizer, texts, temp=1, top_p=1):
     try:
         tokenizer.pad_token = tokenizer.eos_token
         output_texts = []
         for id, text in enumerate(texts):
-            logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
+            if isinstance(text, str):
+                logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
 
-            inputs = tokenizer(text, return_tensors="pt")
-            outputs = model.generate(
-                inputs.input_ids.to(device),
-                max_length=envs.MAX_RESPONSE_LEN,
-                pad_token_id=tokenizer.eos_token_id,
-            )
-            output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
-            output_texts.append(output_text)
+                inputs = tokenizer(text, return_tensors="pt")
+                outputs = model.generate(
+                    inputs.input_ids.to(device),
+                    max_length=envs.MAX_RESPONSE_LEN,
+                    pad_token_id=tokenizer.eos_token_id,
+                    temperature=temp,
+                    top_p=top_p,
+                )
+                output_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[
+                    0
+                ]
+                output_texts.append(output_text)
         return output_texts
     except Exception as e:
         logger.error(f"Error generating text: {str(e)}")
@@ -116,9 +129,18 @@ def generate_answers(
                 new_col_name = f"{question_col}_{model_name}"
                 df[new_col_name] = output_texts
 
-                df = df[main_columns + [question_col, new_col_name]]
+                if main_columns[0] in df.columns:
+                    df = df[main_columns + [question_col, new_col_name]]
+
+                if main_columns_xstest[0] in df.columns:
+                    df = df[main_columns_xstest + [question_col, new_col_name]]
+
                 output_path = os.path.join(
-                    envs.GENERATED_DATA_DIR,
+                    (
+                        envs.GENERATED_DATA_DIR_XSTEST
+                        if "xstest" in dataset_path
+                        else envs.GENERATED_DATA_DIR
+                    ),
                     f"{Path(dataset_path).stem}_{model_name}_{question_col}.csv",
                 )
                 logger.info(f"Saving results to {output_path}")
@@ -129,8 +151,21 @@ def generate_answers(
         logger.error(traceback.format_exc())
 
 
+def generate(tokenizer, model, query: str = None, temp=None, top_p=None):
+    try:
+        if query:
+            return generate_text(model, tokenizer, [query], temp, top_p)[0]
+        else:
+            raise ValueError("Query is empty")
+    except Exception as e:
+        logger.error(f"An error occurred in generate_answers: {str(e)}")
+        logger.error(traceback.format_exc())
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run perturbation experiments.")
+    parser = argparse.ArgumentParser(
+        description="Run LLM response generation on give questions."
+    )
     parser.add_argument(
         "--dataset_path", type=str, default=None, help="Path to the dataset file."
     )

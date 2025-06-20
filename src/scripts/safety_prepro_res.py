@@ -1,100 +1,136 @@
-"""
------------------------------------------------------------------------
-File: scripts/safety_prepro_res.py
-Creation Time: Jan 29th 2025, 12:25 am
-Author: Saurabh Zinjad
-Developer Email: saurabhzinjad@gmail.com
-Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
------------------------------------------------------------------------
-"""
+# """
+# -----------------------------------------------------------------------
+# File: scripts/safety_prepro_res.py
+# Creation Time: Feb 1st 2025, 1:09 am
+# Author: Saurabh Zinjad
+# Developer Email: saurabhzinjad@gmail.com
+# Copyright (c) 2023-2025 Saurabh Zinjad. All rights reserved | https://github.com/Ztrimus
+# -----------------------------------------------------------------------
+# """
 
-import os
+# import torch
+# import argparse
+# import traceback
+# import pandas as pd
+# from transformers import AutoTokenizer, AutoModelForCausalLM, DataCollatorWithPadding
+# from accelerate import Accelerator, DistributedType
+# from utils import measure_execution_time, print_log, filter_safety_response
+# from config import envs, credentials
 
-import argparse
-import traceback
-from typing import List
-from utils import get_dataframe, split_string_into_list, measure_execution_time
-from config import envs, credentials, models
-from pathlib import Path
-
-import torch
-import pandas as pd
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import logging
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-logger.info(f"Device: {device}")
+# # Initialize accelerator first
+# accelerator = Accelerator(mixed_precision="fp16")
+# device = accelerator.device
 
 
-@measure_execution_time
-def moderate(model, tokenizer, texts):
-    try:
-        output_texts = []
-        for id, text in enumerate(texts):
-            logger.info(f"{'='*15} {id+1}/{len(texts)} text: {text}")
+# @measure_execution_time
+# def moderate_batch(model, tokenizer, texts, max_batch_size=128):
+#     output_texts = []
+#     print_log(
+#         f"Started safety classification for {len(texts)} texts",
+#         rank=accelerator.process_index,
+#     )
 
-            chat = [{"role": "user", "content": text}]
-            input_ids = tokenizer.apply_chat_template(chat, return_tensors="pt").to(
-                device
-            )
-            output = model.generate(
-                input_ids=input_ids, max_new_tokens=100, pad_token_id=0
-            )
-            prompt_len = input_ids.shape[-1]
-            output_text = tokenizer.decode(
-                output[0][prompt_len:], skip_special_tokens=True
-            )
-            output_texts.append(output_text)
-        return output_texts
-    except Exception as e:
-        logger.error(f"Error generating text: {str(e)}")
-        return None
+#     # Dynamic batch sizing based on sequence length
+#     collator = DataCollatorWithPadding(
+#         tokenizer=tokenizer, padding="longest", max_length=512, pad_to_multiple_of=64
+#     )
 
+#     # Prepare batches with accelerator
+#     with accelerator.split_between_processes(texts) as local_texts:
+#         batches = [
+#             local_texts[i : i + max_batch_size]
+#             for i in range(0, len(local_texts), max_batch_size)
+#         ]
 
-def check_safety():
-    try:
-        model_id = "meta-llama/Llama-Guard-3-8B"
+#         for batch_idx, batch_texts in enumerate(batches):
+#             if accelerator.is_main_process:
+#                 print_log(
+#                     f"Processing batch {batch_idx+1}/{len(batches)} (size: {len(batch_texts)})"
+#                 )
 
-        tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model_name_or_path=model_id,
-            token=credentials.HF_TOKEN,
-            cache_dir=envs.MODELS_DIR,
-        )
+#             # Prepare inputs with optimized padding
+#             batch_inputs = tokenizer(
+#                 batch_texts,
+#                 padding=True,
+#                 truncation=True,
+#                 return_tensors="pt",
+#                 max_length=512,
+#                 pad_to_multiple_of=64,
+#             ).to(device)
 
-        model = AutoModelForCausalLM.from_pretrained(
-            pretrained_model_name_or_path=model_id,
-            token=credentials.HF_TOKEN,
-            cache_dir=envs.MODELS_DIR,
-        ).to(device)
+#             with torch.no_grad(), torch.amp.autocast(device_type=device.type):
+#                 outputs = model.generate(
+#                     **batch_inputs,
+#                     max_new_tokens=5,
+#                     pad_token_id=tokenizer.pad_token_id,
+#                     do_sample=False,
+#                     temperature=0.0,
+#                     num_return_sequences=1,  # Single classification
+#                     output_scores=True,  # Enable confidence scoring
+#                     return_dict_in_generate=True,
+#                 )
 
-        question_col_list = ["original_response_pre", "perturbed_response_pre"]
-        data_dir = "../../data/"
-        dataset_path = os.path.join(data_dir, "analyzed/catHarmQA/combined_catqa.csv")
-        data = pd.read_csv(dataset_path)
+#             # Decode outputs across all processes
+#             decoded = [tokenizer.decode(o, skip_special_tokens=True) for o in outputs]
+#             gathered_outputs = accelerator.gather_for_metrics(decoded)
 
-        for question_col in question_col_list:
-            questions = data[question_col].to_list()
+#             if accelerator.is_main_process:
+#                 output_texts.extend(gathered_outputs)
 
-            output_texts = moderate(model, tokenizer, questions)
-            print(f"Storing response in dataframe")
-            new_col_name = f"{question_col}_safety"
-            data.insert(
-                data.columns.get_loc(question_col) + 1,
-                new_col_name,
-                output_texts,
-            )
-
-            data.to_csv(dataset_path, index=False)
-    except Exception as e:
-        logger.error(f"An error occurred in generate_answers: {str(e)}")
-        logger.error(traceback.format_exc())
+#     return output_texts
 
 
-if __name__ == "__main__":
-    check_safety()
+# def check_safety(dataset_path):
+#     try:
+#         model_id = "meta-llama/Llama-Guard-3-8B"
+
+#         # Load model with accelerator
+#         tokenizer = AutoTokenizer.from_pretrained(
+#             model_id,
+#             token=credentials.HF_TOKEN,
+#             cache_dir=envs.MODELS_DIR,
+#             padding_side="left",
+#         )
+
+#         model = AutoModelForCausalLM.from_pretrained(
+#             model_id,
+#             token=credentials.HF_TOKEN,
+#             cache_dir=envs.MODELS_DIR,
+#             torch_dtype=torch.float16,
+#             device_map="auto",
+#         )
+
+#         # Prepare with accelerator
+#         model, tokenizer = accelerator.prepare(model, tokenizer)
+
+#         # Column resolution logic
+#         question_col_list = ["perturbed_response_pre", "original_response_pre"]
+
+#         for question_col in question_col_list:
+#             # Load data once per node
+#             if accelerator.is_local_main_process:
+#                 data = pd.read_csv(dataset_path)
+#                 questions = data[question_col].fillna("").to_list()
+#             else:
+#                 questions = []
+
+#             # Broadcast data to all processes
+#             questions = accelerator.broadcast(questions)
+
+#             output_texts = moderate_batch(model, tokenizer, questions)
+
+#             if accelerator.is_main_process:
+#                 # Save results
+#                 data[f"{question_col}_safety"] = output_texts
+#                 data.to_csv(dataset_path, index=False)
+
+#     except Exception as e:
+#         print_log(f"Error: {str(e)}", is_error=True)
+#         accelerator.print(traceback.format_exc())
+
+
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("--dataset_path", type=str, required=True)
+#     args = parser.parse_args()
+#     check_safety(args.dataset_path)

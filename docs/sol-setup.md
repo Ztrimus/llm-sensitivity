@@ -39,5 +39,7 @@
 
 # SOL Resources
 
--   SOL Computer UI: https://ood05.sol.rc.asu.edu/pun/sys/dashboard/
--   VSCode setup for SOL: https://asurc.atlassian.net/wiki/spaces/RC/pages/1907818602/VSCode
+-   [SOL Computer UI](https://ood05.sol.rc.asu.edu/pun/sys/dashboard/)
+-   [VSCode setup for SOL](https://asurc.atlassian.net/wiki/spaces/RC/pages/1907818602/VSCode)
+-   [Pulling Job Statistics](https://asurc.atlassian.net/wiki/spaces/RC/pages/1906016458/Pulling+Job+Statistics#Seff)
+-   [Slurm Accounts](https://asurc.atlassian.net/wiki/spaces/RC/pages/2430304258/Slurm+Accounts)
