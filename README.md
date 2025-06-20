@@ -1,5 +1,9 @@
 # LLM Sensitivity
 
+## Documentation
+- [Setup Documentation](/docs/)
+- https://deepwiki.com/Ztrimus/llm-sensitivity
+
 ## Dataset
 
 -   GitHub Typo Corpus data can be download from [here](https://github-typo-corpus.s3.amazonaws.com/data/github-typo-corpus.v1.0.0.jsonl.gz)
