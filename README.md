@@ -1,14 +1,10 @@
 # LLM Sensitivity
 
 ## Documentation
+- [Presentation Deck](/docs/Thesis%20Defense%20-%20Presentation.pdf)
+- [In Depth Interactive Documentation](https://deepwiki.com/Ztrimus/llm-sensitivity)
+- [Full Research Paper](/docs/Thesis%20Paper%20-%20Proquest.pdf)
 - [Setup Documentation](/docs/)
-- https://deepwiki.com/Ztrimus/llm-sensitivity
-
-## Dataset
-
--   GitHub Typo Corpus data can be download from [here](https://github-typo-corpus.s3.amazonaws.com/data/github-typo-corpus.v1.0.0.jsonl.gz)
--   https://arxiv.org/pdf/1911.12893.pdf
--   https://github.com/mhagiwara/github-typo-corpus
 
 ## Setup
 
